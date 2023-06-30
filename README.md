@@ -1,2 +1,1 @@
-# pos
-Point of Sale
+<h2>Open Commercial Point of Sale Frontend</h2>
