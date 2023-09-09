@@ -1,0 +1,21 @@
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
+
+.app-login {
+  .logo {
+    width: 8rem;
+    @include media-breakpoint-up(md) {
+      width: 11rem;
+    }
+    height: auto;
+  }
+
+  .login-container {
+    min-height: 30rem;
+    @include media-breakpoint-up(md) {
+      height: 60%;
+    }
+  }
+}

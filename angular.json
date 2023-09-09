@@ -23,6 +23,9 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "secure-ls"
+            ],
             "localize": ["es-AR"],
             "outputPath": "dist/pos",
             "index": "src/index.html",
