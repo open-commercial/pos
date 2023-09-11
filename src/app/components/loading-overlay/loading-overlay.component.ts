@@ -1,5 +1,5 @@
 import { LoadingOverlayService } from './../../services/loading-overlay.service';
-import { Component, OnInit, effect } from '@angular/core';
+import { Component, effect } from '@angular/core';
 
 @Component({
   selector: 'app-loading-overlay',
