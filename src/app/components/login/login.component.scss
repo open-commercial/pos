@@ -14,7 +14,10 @@
 
   .login-container {
     min-height: 30rem;
+    max-width: 20rem;
     @include media-breakpoint-up(md) {
+      max-width: unset;
+      width: 25rem;
       height: 60%;
     }
   }

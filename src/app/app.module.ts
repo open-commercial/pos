@@ -27,7 +27,6 @@ import {
   faArrowRightFromBracket, //It's not necessary to rename because there's no other version of this icon
   faKey as fasKey, faSpinner as fasSpinner
 } from '@fortawesome/free-solid-svg-icons';
-import { PasswordResetComponent } from './components/password-reset/password-reset.component';
 import { LoadingOverlayComponent } from './components/loading-overlay/loading-overlay.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -38,7 +37,6 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     LoginComponent,
     PageNotFoundComponent,
     HomeComponent,
-    PasswordResetComponent,
     LoadingOverlayComponent,
     NavbarComponent
   ],
