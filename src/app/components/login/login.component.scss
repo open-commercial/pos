@@ -7,17 +7,16 @@
   .logo {
     width: 8rem;
     @include media-breakpoint-up(md) {
-      width: 11rem;
+      width: 10rem;
     }
     height: auto;
   }
 
   .login-container {
-    min-height: 30rem;
-    max-width: 20rem;
+    width: 100%;
+    max-width: 25rem;
     @include media-breakpoint-up(md) {
-      max-width: unset;
-      width: 25rem;
+      max-width: 28rem;
       height: 60%;
     }
   }

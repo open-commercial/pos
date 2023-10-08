@@ -1,7 +1,7 @@
 <div class="app-login h-100 d-flex flex-column justify-content-center align-items-center">
-    <div class="login-container p-4 p-md-5 m-3 m-md-0 rounded d-flex flex-column justify-content-evenly align-items-center">
-      <img class="logo img-fluid d-inline-block mb-3" src="assets/logo-opensource.png" alt="Logo de Pos">
-      <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="form">
+    <div class="login-container p-4 p-md-5 m-3 m-md-0 text-center">
+      <img class="logo img-fluid d-inline-block mb-5" src="assets/logo-opensource.png" alt="Logo de Pos">
+      <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="form" class="text-start">
         <ngb-alert #errorAlert type="danger" *ngIf="errorMessage" (closed)="errorMessage=''" class="text-center text-md-start">
           {{ errorMessage }}
         </ngb-alert>
@@ -27,7 +27,7 @@
             <div *ngIf="!!f && f.password.errors['required']">Requerido</div>
           </div>
         </div>
-        <div class="d-grid gap-2 col-md-6 mx-auto mb-2">
+        <div class="d-grid gap-2 mt-4">
           <button type="submit" class="btn btn-success">Ingresar</button>
         </div>
       </form>
