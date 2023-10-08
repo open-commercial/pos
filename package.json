@@ -4,12 +4,9 @@
   "engines": {
     "node": "16.14"
   },
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+  "scripts": {    
+    "build": "ng build --configuration ${ENV_NAME}",
+    "start": "ng serve"
   },
   "private": true,
   "dependencies": {
