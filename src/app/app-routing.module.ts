@@ -5,6 +5,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { HomeComponent } from './components/home/home.component';
 import { authGuard } from './guards/auth.guard';
 import { publicGuard } from './guards/public.guard';
+import { ProductosComponent } from './components/productos/productos.component';
 
 const MAIN_TITLE = 'Punto de Ventas';
 
@@ -15,10 +16,10 @@ const routes: Routes = [
     component: HomeComponent,
     canActivate: [authGuard],
     children: [
-
+      { path: "", component: ProductosComponent }
     ]
   },
-  { path: '',   redirectTo: '/pos', pathMatch: 'full' },
+  { path: '', redirectTo: '/pos', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent },
 ];
 

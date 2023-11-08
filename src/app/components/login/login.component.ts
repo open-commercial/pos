@@ -64,7 +64,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
       this.authService.login(
         credencial,
         () => this.loadingOverlayService.activate(),
-        null,
+        () => { this.authService.getLoggedInUsuario()?.subscribe(); },
         (err: string) => {
           this.pError.next(err);
           this.usernameFocus();

@@ -1,0 +1,41 @@
+<div class="container-xxl app-productos">
+  <div class="search-container">
+    <input
+      id="search-input"
+      type="text" class="form-control" placeholder="Buscar un producto..."
+      [(ngModel)]="inputText"
+      (keyup)="search()"
+    >
+  </div>
+  <div id="productos" *ngIf="productos.length" class="row">
+    <div class="col-sm-6 col-lg-12" *ngFor="let p of productos">
+      <div class="shadow-sm producto d-flex flex-column flex-lg-row">
+        <div class="d-flex flex-column flex-lg-row w-lg-50 align-items-lg-center">
+          <div>
+            <div class="img-container">
+              <img [src]="p.urlImagen ? p.urlImagen : 'https://res.cloudinary.com/hf0vu1bg2/image/upload/v1545616229/assets/sin_imagen.png'" [alt]="'Imagen del producto ' + p.codigo">
+            </div>
+          </div>
+          <div class="descripcion flex-fill px-2">
+            {{ p.descripcion }}
+          </div>
+        </div>
+        <div class="d-flex flex-column flex-lg-row w-lg-50 align-items-lg-center">
+          <div class="w-lg-50 px-2 text-lg-center text-end fw-bold">{{ p.precioVentaPublico | currency:'ARS':'symbol':'1.0-2'  }}</div>
+          <div class="w-lg-50 px-2 text-lg-center">
+            <span class="d-lg-none">Stock disponible: </span>
+            {{ p.cantidadTotalEnSucursalesDisponible | number: '1.0-2' }} {{ p.nombreMedida }}
+          </div>
+          <div class="w-lg-50 px-2 text-end text-lg-center">
+            <button class="btn btn-link text-dark text-decoration-none">
+              <fa-icon [icon]="['fas','cart-plus']" size="2x"></fa-icon>
+            </button>
+          <div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="fetching" class="text-center mb-5">
+    <fa-icon [icon]="['fas', 'spinner']" [spin]="true" size="2x"></fa-icon>
+  </div>
+</div>

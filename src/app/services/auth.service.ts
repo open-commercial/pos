@@ -1,3 +1,4 @@
+import { Usuario } from './../models/usuario';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
@@ -5,11 +6,11 @@ import { StorageService } from './storage.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
 import { finalize, tap } from 'rxjs/operators';
-import { Usuario } from '../models/usuario';
 import { Observable, Subject } from 'rxjs';
 import { UsuarioService } from './usuario.service';
+import { SucursalService } from './sucursal.service';
 
-export const AUTH_TOKEN_KEY = 'token';
+export const STORAGE_AUTH_TOKEN_KEY = 'token';
 
 export interface Credential {
   username: string;
@@ -30,13 +31,19 @@ export class AuthService {
     return this.pUser;
   }
 
+  set user(value: Usuario) {
+    this.pUser = value;
+    this.userSubjet.next(value);
+  }
+
   private userSubjet = new Subject<Usuario>();
   user$ = this.userSubjet.asObservable();
 
   constructor(private http: HttpClient,
               private storageService: StorageService,
               private router: Router,
-              private usuarioService: UsuarioService) { }
+              private usuarioService: UsuarioService,
+              private sucursalService: SucursalService) { }
 
   login(
     credencial: Credential,
@@ -51,7 +58,7 @@ export class AuthService {
       .pipe(finalize(() => { if (typeof done === 'function') { done(); } }))
       .subscribe({
         next: token => {
-          this.storageService.setItem(AUTH_TOKEN_KEY, token);
+          this.storageService.setItem(STORAGE_AUTH_TOKEN_KEY, token);
           if (typeof success === 'function') { success(); }
           this.router.navigate(['pos']);
         },
@@ -74,6 +81,7 @@ export class AuthService {
       .subscribe({
         next: () => {
           this.cleanAccessTokenInLocalStorage();
+          this.cleanSessionStorage();
           if (typeof success === 'function') { success(); }
           this.router.navigate(['login']);
         },
@@ -84,11 +92,15 @@ export class AuthService {
   }
 
   cleanAccessTokenInLocalStorage() {
-    this.storageService.removeItem(AUTH_TOKEN_KEY);
+    this.storageService.removeItem(STORAGE_AUTH_TOKEN_KEY);
+  }
+
+  cleanSessionStorage() {
+    sessionStorage.clear();
   }
 
   getToken(): string {
-    return this.storageService.getItem(AUTH_TOKEN_KEY);
+    return this.storageService.getItem(STORAGE_AUTH_TOKEN_KEY);
   }
 
   isAuthenticated(): boolean {
@@ -110,8 +122,10 @@ export class AuthService {
     if (idUsuario === null) { return null; }
     return this.usuarioService.getUsuario(idUsuario)
       .pipe(tap(u => {
-        this.pUser = u;
-        this.userSubjet.next(u);
+        this.user = u;
+        if (!this.sucursalService.selectedSucursalId && u.idSucursalPredeterminada) {
+          this.sucursalService.selectedSucursalId = u.idSucursalPredeterminada;
+        }
       }))
     ;
   }

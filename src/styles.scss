@@ -10,3 +10,9 @@ html, body, app-root, main#main {
 .pointer-cursor {
   cursor: pointer;
 }
+
+.w-lg-50 {
+  @include media-breakpoint-up(lg) {
+    width: 50%;
+  }
+}

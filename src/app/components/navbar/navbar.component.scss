@@ -1,6 +1,16 @@
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
 .app-navbar {
   img.logo {
     width: 2.2rem;
     height: 2.2rem;
+  }
+  .nav-item-custom {
+    max-width: 100%;
+    @include media-breakpoint-up(sm) {
+      max-width: unset;
+    }
   }
 }
