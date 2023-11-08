@@ -1,5 +1,5 @@
 import { SucursalService } from './../../services/sucursal.service';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription, finalize } from 'rxjs';
 import { Sucursal } from 'src/app/models/sucursal';
 import { Usuario } from 'src/app/models/usuario';
