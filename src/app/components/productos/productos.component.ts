@@ -18,7 +18,7 @@ export class ProductosComponent implements OnInit, OnDestroy {
   isLastPage = true;
 
   private searchSubject = new Subject<string>();
-  private readonly debounceTimeMs = 1000;
+  private readonly debounceTimeMs = 500;
   inputText = sessionStorage.getItem(PRODUCTOS_INPUT_TEXT_KEY) ?? '';
   fetching = false;
 
