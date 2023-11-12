@@ -7,7 +7,7 @@ import { authGuard } from './guards/auth.guard';
 import { publicGuard } from './guards/public.guard';
 import { ProductosComponent } from './components/productos/productos.component';
 
-const MAIN_TITLE = 'Punto de Ventas';
+const MAIN_TITLE = 'Open Commercial';
 
 const routes: Routes = [
   { path: 'login', title: MAIN_TITLE + " - Ingreso", component: LoginComponent, canActivate: [publicGuard] },
@@ -20,7 +20,7 @@ const routes: Routes = [
     ]
   },
   { path: '', redirectTo: '/pos', pathMatch: 'full' },
-  { path: '**', component: PageNotFoundComponent },
+  { path: '**', title: MAIN_TITLE + " - Page Not Found", component: PageNotFoundComponent },
 ];
 
 @NgModule({
