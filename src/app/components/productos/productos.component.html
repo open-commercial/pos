@@ -29,7 +29,7 @@
           </div>
         </div>
         <div class="d-flex flex-column flex-lg-row w-lg-50 align-items-lg-center">
-          <div class="w-lg-50 px-2 text-lg-center text-end fw-bold">{{ p.precioVentaPublico | currency:'ARS':'symbol':'1.0-2'  }}</div>
+          <div class="w-lg-50 px-2 text-lg-center text-end fw-bold">{{ p.precioLista | currency:'ARS':'symbol':'1.0-2'  }}</div>
           <div class="w-lg-50 px-2 text-lg-center">
             <span class="d-lg-none">Stock disponible: </span>
             {{ p.cantidadTotalEnSucursalesDisponible | number: '1.0-2' }} {{ p.nombreMedida }}
@@ -44,7 +44,4 @@
     </div>
   </div>
   </div>
-  <!-- <div *ngIf="fetching" class="text-center mb-5">
-    <fa-icon [icon]="['fas', 'spinner']" [spin]="true" size="2x"></fa-icon>
-  </div> -->
 </div>
