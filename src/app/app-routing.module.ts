@@ -10,9 +10,8 @@ import { ProductosComponent } from './components/productos/productos.component';
 const MAIN_TITLE = 'Open Commercial';
 
 const routes: Routes = [
-  { path: 'login', title: MAIN_TITLE + " - Ingreso", component: LoginComponent, canActivate: [publicGuard] },
+  { path: 'login', component: LoginComponent, canActivate: [publicGuard] },
   { path: 'pos',
-    title: MAIN_TITLE + " - Principal",
     component: HomeComponent,
     canActivate: [authGuard],
     children: [
@@ -20,7 +19,7 @@ const routes: Routes = [
     ]
   },
   { path: '', redirectTo: '/pos', pathMatch: 'full' },
-  { path: '**', title: MAIN_TITLE + " - Page Not Found", component: PageNotFoundComponent },
+  { path: '**', component: PageNotFoundComponent },
 ];
 
 @NgModule({

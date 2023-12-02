@@ -1,6 +1,6 @@
-import { Subject, debounceTime, finalize } from 'rxjs';
+import { debounce, finalize, fromEvent, of, timer } from 'rxjs';
 import { BusquedaProductoCriteria } from './../../models/criteria/busqueda-producto-criteria';
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { LoadingOverlayService } from 'src/app/services/loading-overlay.service';
 import { ProductoService } from 'src/app/services/producto.service';
 import { SucursalService } from 'src/app/services/sucursal.service';
@@ -13,26 +13,24 @@ const PRODUCTOS_INPUT_TEXT_KEY = 'productosInputText';
   templateUrl: './productos.component.html',
   styleUrls: ['./productos.component.scss']
 })
-export class ProductosComponent implements OnInit, OnDestroy {
+export class ProductosComponent implements OnInit, AfterViewInit {
   infinteSrollPage = 0;
   isLastPage = true;
 
-  private searchSubject = new Subject<string>();
-  private readonly debounceTimeMs = 500;
+  private readonly debounceTimeMs = 750;
   inputText = sessionStorage.getItem(PRODUCTOS_INPUT_TEXT_KEY) ?? '';
-  fetching = false;
 
   productos: Producto[] = [];
+
+  @ViewChild('searchInput') searchInput: ElementRef<HTMLInputElement>|undefined;
 
   @HostListener('document:scroll', ['$event'])
   public onViewportScroll() {
     const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
-
     if (window.scrollY >= scrollableHeight) {
-        //console.log('User has scrolled to the bottom of the page!')
         if (!this.isLastPage) {
           this.infinteSrollPage += 1;
-          this.getProductos(this.inputText);
+          this.getProductos();
         }
     }
   }
@@ -42,44 +40,57 @@ export class ProductosComponent implements OnInit, OnDestroy {
               private loadingOverlayService: LoadingOverlayService){}
 
   ngOnInit(): void {
-    this.searchSubject
-      .pipe(debounceTime(this.debounceTimeMs))
-      .subscribe((searchTerm) => {
-        this.infinteSrollPage = 0;
-        this.getProductos(searchTerm);
-      })
-    ;
     this.sucursalService.selectedSucursalId$.subscribe(() => {
-      this.getProductos(this.inputText);
+      this.search(this.inputText);
     });
   }
 
-  ngOnDestroy() {
-    this.searchSubject.complete();
+  ngAfterViewInit(): void {
+    if (this.searchInput) {
+      fromEvent(this.searchInput.nativeElement, 'keyup')
+        .pipe(debounce(e => {
+          return (e as KeyboardEvent).key !== 'Enter' ? timer(this.debounceTimeMs) : of({});
+        }))
+        .subscribe(() => {
+          const searchTerm = this.searchInput?.nativeElement.value ?? '';
+          this.search(searchTerm);
+        })
+      ;
+      this.searchInput.nativeElement.value = this.inputText;
+    }
   }
 
-  search() {
-    sessionStorage.setItem(PRODUCTOS_INPUT_TEXT_KEY, this.inputText);
-    this.searchSubject.next(this.inputText);
+  private search(searchTerm: string) {
+    sessionStorage.setItem(PRODUCTOS_INPUT_TEXT_KEY, searchTerm);
+    this.inputText = searchTerm;
+    this.infinteSrollPage = 0;
+    this.getProductos();
   }
 
-  getProductos(searchTerm: string = '') {
+  clearInput() {
+    if (this.searchInput) {
+      this.searchInput.nativeElement.value = '';
+      this.search('');
+    }
+  }
+
+  getProductos() {
     const sucursalId = this.sucursalService.selectedSucursalId;
 
     if (sucursalId) {
       const criteria: BusquedaProductoCriteria = {
         pagina: this.infinteSrollPage,
-        codigo: searchTerm,
-        descripcion: searchTerm,
+        codigo: this.inputText,
+        descripcion: this.inputText,
         ordenarPor: ['descripcion'],
         sentido: 'ASC'
       };
       if (this.infinteSrollPage === 0) {
         this.productos = [];
       }
-      this.fetching = true;
+      this.loadingOverlayService.activate();
       this.productoService.getProductos(criteria, sucursalId)
-        .pipe(finalize(() => this.fetching = false))
+        .pipe(finalize(() => this.loadingOverlayService.deactivate()))
         .subscribe({
           next: data => {
             this.productos = this.productos.concat(data.content);

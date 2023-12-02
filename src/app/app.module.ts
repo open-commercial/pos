@@ -26,7 +26,8 @@ import {
   faCircleUser as fasCircleUser, faUser as fasUser,
   faArrowRightFromBracket, //It's not necessary to rename because there's no other version of this icon
   faKey as fasKey, faSpinner as fasSpinner, faStore as fasStore,
-  faCheck as fasCheck, faCartPlus as fasCartPlus
+  faCheck as fasCheck, faCartPlus as fasCartPlus, faMagnifyingGlass as fasMagnifyingGlass,
+  faXmark as fasXmark
 } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlayComponent } from './components/loading-overlay/loading-overlay.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -65,7 +66,7 @@ export class AppModule {
       farCircleUser,
       //solid
       fasCircleUser, fasUser, faArrowRightFromBracket, fasKey, fasSpinner,
-      fasStore, fasCheck, fasCartPlus
+      fasStore, fasCheck, fasCartPlus, fasMagnifyingGlass, fasXmark
     );
   }
 }

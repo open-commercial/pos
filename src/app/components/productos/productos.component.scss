@@ -6,13 +6,40 @@
   .search-container {
     display: flex;
     justify-content: center;
-    margin: 1rem 0;
-    input {
+    @include media-breakpoint-up(md) {
+      margin: 1rem 0;
+    }
+    .input-group {
+      $border-radius: 1.5rem;
       width: 100%;
       max-width: 40rem;
-      -webkit-border-radius: 2rem;
-      -moz-border-radius: 2rem;
-      border-radius: 2rem;
+      .manifying-glass-container {
+        background-color: white;
+        border-color: rgba(var(--bs-success-rgb), 0.25);
+        border-right: none;
+        -webkit-border-top-left-radius: $border-radius;
+        -webkit-border-bottom-left-radius: $border-radius;
+        -moz-border-radius-topleft: $border-radius;
+        -moz-border-radius-bottomleft: $border-radius;
+        border-top-left-radius: $border-radius;
+        border-bottom-left-radius: $border-radius;
+      }
+      input {
+        border-left: none;
+        border-right: none;
+        padding-left: 0.2rem;
+        padding-right: 0.2rem;
+      }
+      .btn-times {
+        border-color: rgba(var(--bs-success-rgb), 0.25);
+        border-left: none;
+        -webkit-border-top-right-radius: $border-radius;
+        -webkit-border-bottom-right-radius: $border-radius;
+        -moz-border-radius-topright: $border-radius;
+        -moz-border-radius-bottomright: $border-radius;
+        border-top-right-radius: $border-radius;
+        border-bottom-right-radius: $border-radius;
+      }
     }
   }
   input#search-input {

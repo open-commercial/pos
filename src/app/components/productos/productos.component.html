@@ -1,11 +1,18 @@
 <div class="container-xxl app-productos">
   <div class="search-container">
-    <input
-      id="search-input"
-      type="text" class="form-control" placeholder="Buscar un producto..."
-      [(ngModel)]="inputText"
-      (keyup)="search()"
-    >
+      <div class="input-group mb-3">
+        <span class="input-group-text manifying-glass-container">
+          <fa-icon [icon]="['fas', 'magnifying-glass']"></fa-icon>
+        </span>
+        <input
+          id="search-input"
+          type="text" class="form-control" placeholder="Buscar un producto..."
+          #searchInput
+        >
+        <button class="btn btn-light btn-times" type="button" (click)="clearInput()" [disabled]="inputText === ''">
+          <fa-icon [icon]="['fas', 'xmark']"></fa-icon>
+        </button>
+      </div>
   </div>
   <div id="productos" *ngIf="productos.length" class="row">
     <div class="col-sm-6 col-lg-12" *ngFor="let p of productos">
@@ -36,7 +43,8 @@
       </div>
     </div>
   </div>
-  <div *ngIf="fetching" class="text-center mb-5">
-    <fa-icon [icon]="['fas', 'spinner']" [spin]="true" size="2x"></fa-icon>
   </div>
+  <!-- <div *ngIf="fetching" class="text-center mb-5">
+    <fa-icon [icon]="['fas', 'spinner']" [spin]="true" size="2x"></fa-icon>
+  </div> -->
 </div>
