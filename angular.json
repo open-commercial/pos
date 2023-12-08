@@ -53,6 +53,13 @@
                   "with": "src/environments/environment.production.ts"
                 }
               ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -61,22 +68,12 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "8kb"
+                  "maximumWarning": "6kb"
                 }
-              ],
-              "outputHashing": "all"
-            },
-            "development": {
-              "buildOptimizer": false,
-              "optimization": false,
-              "vendorChunk": true,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "namedChunks": true
+              ]
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -86,9 +83,6 @@
           "configurations": {
             "production": {
               "browserTarget": "pos:build:production"
-            },
-            "development": {
-              "browserTarget": "pos:build:development"
             }
           }
         },
