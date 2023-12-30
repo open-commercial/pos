@@ -24,7 +24,7 @@ import {
 //Solid
 import {
   faCircleUser as fasCircleUser, faUser as fasUser,
-  faArrowRightFromBracket, //It's not necessary to rename because there's no other version of this icon
+  faRightFromBracket, //It's not necessary to rename because there's no other version of this icon
   faKey as fasKey, faSpinner as fasSpinner, faStore as fasStore,
   faCheck as fasCheck, faCartPlus as fasCartPlus, faMagnifyingGlass as fasMagnifyingGlass,
   faXmark as fasXmark
@@ -65,7 +65,7 @@ export class AppModule {
       //regular
       farCircleUser,
       //solid
-      fasCircleUser, fasUser, faArrowRightFromBracket, fasKey, fasSpinner,
+      fasCircleUser, fasUser, faRightFromBracket, fasKey, fasSpinner,
       fasStore, fasCheck, fasCartPlus, fasMagnifyingGlass, fasXmark
     );
   }

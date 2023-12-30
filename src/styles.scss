@@ -11,8 +11,8 @@ html, body, app-root, main#main {
   cursor: pointer;
 }
 
-.w-lg-50 {
-  @include media-breakpoint-up(lg) {
+.w-md-50 {
+  @include media-breakpoint-up(md) {
     width: 50%;
   }
 }

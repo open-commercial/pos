@@ -6,9 +6,7 @@
   .search-container {
     display: flex;
     justify-content: center;
-    @include media-breakpoint-up(md) {
-      margin: 1rem 0;
-    }
+    margin: 1rem 0;
     .input-group {
       $border-radius: 1.5rem;
       width: 100%;

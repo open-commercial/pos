@@ -20,8 +20,8 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
             <li *ngFor="let s of sucursales">
-              <a class="dropdown-item pointer-cursor" (click)="selectSucursal(s)" [ngClass]="{ 'disabled' : selectedSucursal?.idSucursal === s.idSucursal }">
-                <fa-icon [icon]="['fas','check']" *ngIf="selectedSucursal?.idSucursal === s.idSucursal"></fa-icon>
+              <a class="dropdown-item pointer-cursor" (click)="selectSucursal(s)" [ngClass]="{ 'active' : selectedSucursal?.idSucursal === s.idSucursal }">
+                <fa-icon [icon]="['fas','store']"></fa-icon>
                 {{ s.nombre }}
               </a>
             </li>
@@ -30,12 +30,13 @@
         <li class="nav-item nav-item-custom" ngbDropdown>
           <a class="nav-link text-truncate" ngbDropdownToggle role="button" data-bs-toggle="dropdown">
             <fa-icon [icon]="['fas','user']"></fa-icon>
-            <span class="d-none d-md-inline ms-1">{{ usuario.username }}</span>
+            <span class="d-none d-md-inline ms-1">{{ usuario.nombre  }} {{ usuario.apellido }}</span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+            <li class="d-md-none"><h6 class="dropdown-header">{{ usuario.nombre  }} {{ usuario.apellido }}</h6></li>
             <li>
               <a class="dropdown-item pointer-cursor" (click)="logout()">
-                <fa-icon [icon]="['fas','arrow-right-from-bracket']"></fa-icon> Salir
+                <fa-icon [icon]="['fas','right-from-bracket']"></fa-icon> Salir
               </a>
             </li>
           </ul>
@@ -44,7 +45,7 @@
     </div>
   </div>
 </nav>
-<div class="d-md-none text-center py-2">
+<div class="d-md-none text-center py-2 border-bottom border-success border-opacity-25">
   <fa-icon [icon]="['fas','store']"></fa-icon>
   {{ selectedSucursal ? selectedSucursal.nombre : '(No seleccionada)'}}
 </div>

@@ -13,4 +13,8 @@
       max-width: unset;
     }
   }
+  .dropdown-item.active, .dropdown-item:active {
+    color: $body-color;
+    background-color: rgba(var(--bs-success-rgb),var(--bs-bg-opacity));
+  }
 }

@@ -1,6 +1,6 @@
 <div class="container-xxl app-productos">
   <div class="search-container">
-      <div class="input-group mb-3">
+      <div class="input-group">
         <span class="input-group-text manifying-glass-container">
           <fa-icon [icon]="['fas', 'magnifying-glass']"></fa-icon>
         </span>
@@ -24,10 +24,10 @@
           <span class="small">{{ p.codigo }}</span><br>
           {{ p.descripcion }}
         </div>
-        <div class="precio fw-bold w-50 text-md-center px-md-2 mb-2 mb-md-0">
+        <div class="precio fw-bold w-md-50 text-md-center px-md-2 mb-2 mb-md-0">
           {{ p.precioLista | currency:'ARS':'symbol':'1.0-2'  }}
         </div>
-        <div class="stock w-50 text-md-center">
+        <div class="stock w-md-50 text-md-center">
           <span class="d-md-none">Disponible: </span>
           {{ p.cantidadTotalEnSucursalesDisponible | number: '1.0-2' }} {{ p.nombreMedida }}
         </div>
