@@ -19,6 +19,7 @@
             <span class="d-none d-md-inline ms-1">{{ selectedSucursal ? selectedSucursal.nombre : '(No seleccionada)'}}</span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+            <li class="d-md-none"><h6 class="dropdown-header">Sucursales</h6></li>
             <li *ngFor="let s of sucursales">
               <a class="dropdown-item pointer-cursor" (click)="selectSucursal(s)" [ngClass]="{ 'active' : selectedSucursal?.idSucursal === s.idSucursal }">
                 <fa-icon [icon]="['fas','store']"></fa-icon>

@@ -5,6 +5,7 @@ import { LoadingOverlayService } from 'src/app/services/loading-overlay.service'
 import { ProductoService } from 'src/app/services/producto.service';
 import { SucursalService } from 'src/app/services/sucursal.service';
 import { Producto } from 'src/app/models/producto';
+import { CantidadEnSucursal } from "src/app/models/cantidad-en-sucursal";
 
 const PRODUCTOS_INPUT_TEXT_KEY = 'productosInputText';
 
@@ -100,6 +101,12 @@ export class ProductosComponent implements OnInit, AfterViewInit {
         })
       ;
     }
+  }
+
+  getCantidadDisponibleDeSurcusalSelecionada(p: Producto) {
+    const sucursalId = this.sucursalService.selectedSucursalId;        
+    const aux: Array<CantidadEnSucursal> = p.cantidadEnSucursales.filter(c => c.idSucursal === sucursalId);
+    return aux.length ? aux[0].cantidad : 0;    
   }
 }
 
