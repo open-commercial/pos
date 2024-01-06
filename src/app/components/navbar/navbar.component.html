@@ -1,8 +1,7 @@
-<nav class="app-navbar navbar navbar-expand-lg bg-success bg-opacity-25">
+<nav class="app-navbar navbar navbar-expand bg-success bg-opacity-25">
   <div class="container-xxl">
-    <a class="navbar-brand" href="#">
-      <img class="logo" src="assets/logo-opensource.png" alt="Logo de Pos">
-      Punto de Venta
+    <a class="navbar-brand" routerLink="/pos">
+      <img class="logo me-2" src="assets/logo-opensource.png" alt="Logo de Pos">
     </a>
     <button
       class="navbar-toggler" type="button"
@@ -13,15 +12,32 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="navbar-collapse" #collapse="ngbCollapse" [(ngbCollapse)]="!isCollapsed" id="navbarSupportedContent">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0" *ngIf="usuario">
-        <li class="nav-item" ngbDropdown>
-          <a class="nav-link" ngbDropdownToggle role="button" data-bs-toggle="dropdown">
-            <fa-icon [icon]="['far','circle-user']"></fa-icon> {{ usuario.username }}
+      <ul class="navbar-nav ms-auto mb-0" *ngIf="usuario">
+        <li class="nav-item nav-item-custom" ngbDropdown *ngIf="sucursales.length">
+          <a class="nav-link text-truncate" ngbDropdownToggle role="button" data-bs-toggle="dropdown">
+            <fa-icon [icon]="['fas','store']"></fa-icon>
+            <span class="d-none d-md-inline ms-1">{{ selectedSucursal ? selectedSucursal.nombre : '(No seleccionada)'}}</span>
           </a>
           <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+            <li class="d-md-none"><h6 class="dropdown-header">Sucursales</h6></li>
+            <li *ngFor="let s of sucursales">
+              <a class="dropdown-item pointer-cursor" (click)="selectSucursal(s)" [ngClass]="{ 'active' : selectedSucursal?.idSucursal === s.idSucursal }">
+                <fa-icon [icon]="['fas','store']"></fa-icon>
+                {{ s.nombre }}
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item nav-item-custom" ngbDropdown>
+          <a class="nav-link text-truncate" ngbDropdownToggle role="button" data-bs-toggle="dropdown">
+            <fa-icon [icon]="['fas','user']"></fa-icon>
+            <span class="d-none d-md-inline ms-1">{{ usuario.nombre  }} {{ usuario.apellido }}</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+            <li class="d-md-none"><h6 class="dropdown-header">{{ usuario.nombre  }} {{ usuario.apellido }}</h6></li>
             <li>
               <a class="dropdown-item pointer-cursor" (click)="logout()">
-                <fa-icon [icon]="['fas','arrow-right-from-bracket']"></fa-icon> Salir
+                <fa-icon [icon]="['fas','right-from-bracket']"></fa-icon> Salir
               </a>
             </li>
           </ul>
@@ -30,3 +46,7 @@
     </div>
   </div>
 </nav>
+<div class="d-md-none text-center py-2 border-bottom border-success border-opacity-25">
+  <fa-icon [icon]="['fas','store']"></fa-icon>
+  {{ selectedSucursal ? selectedSucursal.nombre : '(No seleccionada)'}}
+</div>

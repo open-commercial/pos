@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -24,12 +24,15 @@ import {
 //Solid
 import {
   faCircleUser as fasCircleUser, faUser as fasUser,
-  faArrowRightFromBracket, //It's not necessary to rename because there's no other version of this icon
-  faKey as fasKey, faSpinner as fasSpinner
+  faRightFromBracket, //It's not necessary to rename because there's no other version of this icon
+  faKey as fasKey, faSpinner as fasSpinner, faStore as fasStore,
+  faCheck as fasCheck, faCartPlus as fasCartPlus, faMagnifyingGlass as fasMagnifyingGlass,
+  faXmark as fasXmark
 } from '@fortawesome/free-solid-svg-icons';
 import { LoadingOverlayComponent } from './components/loading-overlay/loading-overlay.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { ProductosComponent } from './components/productos/productos.component';
 
 @NgModule({
   declarations: [
@@ -38,18 +41,21 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     PageNotFoundComponent,
     HomeComponent,
     LoadingOverlayComponent,
-    NavbarComponent
+    NavbarComponent,
+    ProductosComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     ReactiveFormsModule,
+    FormsModule,
     AppRoutingModule,
     NgbModule,
     FontAwesomeModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: LOCALE_ID, useValue: 'es_AR' },
   ],
   bootstrap: [AppComponent]
 })
@@ -59,7 +65,8 @@ export class AppModule {
       //regular
       farCircleUser,
       //solid
-      fasCircleUser, fasUser, faArrowRightFromBracket, fasKey, fasSpinner
+      fasCircleUser, fasUser, faRightFromBracket, fasKey, fasSpinner,
+      fasStore, fasCheck, fasCartPlus, fasMagnifyingGlass, fasXmark
     );
   }
 }

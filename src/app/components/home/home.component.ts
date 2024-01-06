@@ -1,15 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html'
 })
-export class HomeComponent implements OnInit {
-
+export class HomeComponent implements AfterViewInit {
   constructor(private authService: AuthService) {}
 
-  ngOnInit(): void {
+  ngAfterViewInit(): void {
     if (!this.authService.user) {
       this.authService.getLoggedInUsuario()?.subscribe();
     }
