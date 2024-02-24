@@ -5,7 +5,7 @@
   "engines": {
     "node": "16.14"
   },
-  "scripts": {    
+  "scripts": {
     "build": "ng build --configuration ${ENV_NAME}",
     "start": "ng serve"
   },
@@ -31,7 +31,7 @@
     "rxjs": "~7.8.0",
     "secure-ls": "^1.2.6",
     "tslib": "^2.3.0",
-    "zone.js": "~0.13.0"
+    "zone.js": "~0.14.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.2.0",
@@ -47,6 +47,6 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.1.3"
+    "typescript": "~5.3.3"
   }
 }
