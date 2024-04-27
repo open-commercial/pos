@@ -1,6 +1,7 @@
 {
   "name": "pos",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "private": true,
   "engines": {
     "node": "16.14"
   },
@@ -8,7 +9,6 @@
     "build": "ng build --configuration ${ENV_NAME}",
     "start": "ng serve"
   },
-  "private": true,
   "dependencies": {
     "@angular/animations": "^16.2.1",
     "@angular/common": "^16.2.1",
