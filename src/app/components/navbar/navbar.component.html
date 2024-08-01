@@ -11,7 +11,7 @@
       aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="navbar-collapse" #collapse="ngbCollapse" [(ngbCollapse)]="!isCollapsed" id="navbarSupportedContent">
+    <div class="navbar-collapse" #collapse="ngbCollapse" [ngbCollapse]="!isCollapsed" (ngbCollapseChange)="isCollapsed = $event" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-0" *ngIf="usuario">
         <li class="nav-item nav-item-custom" ngbDropdown *ngIf="sucursales.length">
           <a class="nav-link text-truncate" ngbDropdownToggle role="button" data-bs-toggle="dropdown">

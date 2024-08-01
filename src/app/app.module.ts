@@ -1,6 +1,6 @@
 import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -34,31 +34,25 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ProductosComponent } from './components/productos/productos.component';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    LoginComponent,
-    PageNotFoundComponent,
-    HomeComponent,
-    LoadingOverlayComponent,
-    NavbarComponent,
-    ProductosComponent
-  ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    ReactiveFormsModule,
-    FormsModule,
-    AppRoutingModule,
-    NgbModule,
-    FontAwesomeModule
-  ],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    { provide: LOCALE_ID, useValue: 'es_AR' },
-  ],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        LoginComponent,
+        PageNotFoundComponent,
+        HomeComponent,
+        LoadingOverlayComponent,
+        NavbarComponent,
+        ProductosComponent
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        ReactiveFormsModule,
+        FormsModule,
+        AppRoutingModule,
+        NgbModule,
+        FontAwesomeModule], providers: [
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+        { provide: LOCALE_ID, useValue: 'es_AR' },
+        provideHttpClient(withInterceptorsFromDi()),
+    ] })
 export class AppModule {
   constructor(library: FaIconLibrary) {
     library.addIcons(
