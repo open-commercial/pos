@@ -2,8 +2,9 @@ import { Component, AfterViewInit } from '@angular/core';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html'
+    selector: 'app-home',
+    templateUrl: './home.component.html',
+    standalone: false
 })
 export class HomeComponent implements AfterViewInit {
   constructor(private authService: AuthService) {}

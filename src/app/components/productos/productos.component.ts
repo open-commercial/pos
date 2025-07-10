@@ -10,9 +10,10 @@ import { CantidadEnSucursal } from "src/app/models/cantidad-en-sucursal";
 const PRODUCTOS_INPUT_TEXT_KEY = 'productosInputText';
 
 @Component({
-  selector: 'app-productos',
-  templateUrl: './productos.component.html',
-  styleUrls: ['./productos.component.scss']
+    selector: 'app-productos',
+    templateUrl: './productos.component.html',
+    styleUrls: ['./productos.component.scss'],
+    standalone: false
 })
 export class ProductosComponent implements OnInit, AfterViewInit {
   infinteSrollPage = 0;

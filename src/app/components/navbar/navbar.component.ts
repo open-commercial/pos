@@ -7,9 +7,10 @@ import { AuthService } from 'src/app/services/auth.service';
 import { LoadingOverlayService } from 'src/app/services/loading-overlay.service';
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+    selector: 'app-navbar',
+    templateUrl: './navbar.component.html',
+    styleUrls: ['./navbar.component.scss'],
+    standalone: false
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   usuario: Usuario|null = null;
