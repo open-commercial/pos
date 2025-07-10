@@ -2,15 +2,12 @@ import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { LoginComponent } from './components/login/login.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { HomeComponent } from './components/home/home.component';
-
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
 
 /**
@@ -18,9 +15,7 @@ import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontaweso
   if there is several versions of the same icon
 */
 //Regular
-import {
-  faCircleUser as farCircleUser
-} from '@fortawesome/free-regular-svg-icons';
+import { faCircleUser as farCircleUser } from '@fortawesome/free-regular-svg-icons';
 //Solid
 import {
   faCircleUser as fasCircleUser, faUser as fasUser,
@@ -34,25 +29,31 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ProductosComponent } from './components/productos/productos.component';
 
-@NgModule({ declarations: [
-        AppComponent,
-        LoginComponent,
-        PageNotFoundComponent,
-        HomeComponent,
-        LoadingOverlayComponent,
-        NavbarComponent,
-        ProductosComponent
-    ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
-        ReactiveFormsModule,
-        FormsModule,
-        AppRoutingModule,
-        NgbModule,
-        FontAwesomeModule], providers: [
-        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-        { provide: LOCALE_ID, useValue: 'es_AR' },
-        provideHttpClient(withInterceptorsFromDi()),
-    ] })
+@NgModule({
+  declarations: [
+    AppComponent,
+    LoginComponent,
+    PageNotFoundComponent,
+    HomeComponent,
+    LoadingOverlayComponent,
+    NavbarComponent,
+    ProductosComponent
+  ],
+  bootstrap: [AppComponent],
+  imports: [
+    BrowserModule,
+    ReactiveFormsModule,
+    FormsModule,
+    AppRoutingModule,
+    NgbModule,
+    FontAwesomeModule
+  ],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: LOCALE_ID, useValue: 'es_AR' },
+    provideHttpClient(withInterceptorsFromDi()),
+  ]
+})
 export class AppModule {
   constructor(library: FaIconLibrary) {
     library.addIcons(
