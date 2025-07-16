@@ -1,31 +1,36 @@
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-import { SucursalRepository } from './../repositories/sucursal.repository';
-import { Injectable } from '@angular/core';
 import { Sucursal } from '../models/sucursal';
+import { environment } from 'src/environments/environment';
 import { StorageService } from './storage.service';
 
-export const STORAGE_SUCURSAL_ID_KEY = 'sucursalId';
+const STORAGE_SUCURSAL_ID_KEY = 'sucursalId';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({providedIn: 'root'})
 export class SucursalService {
-  set selectedSucursalId(value: number) {
-    this.storageService.setItem(STORAGE_SUCURSAL_ID_KEY, value);
-    this.selectedSucursalIdSubject.next(value);
-  }
 
-  get selectedSucursalId(): number|null {
-    return this.storageService.getItem(STORAGE_SUCURSAL_ID_KEY);
-  }
-
-  private selectedSucursalIdSubject = new Subject<number|null>();
+  http = inject(HttpClient);
+  storageService = inject(StorageService);
+  baseUrl = environment.apiUrl + '/api/v1/sucursales';
+  private readonly selectedSucursalIdSubject = new Subject<number|null>();
   selectedSucursalId$ = this.selectedSucursalIdSubject.asObservable();
 
-  constructor(private sucursalRepository: SucursalRepository,
-              private storageService: StorageService) { }
-
-  getSucursales(): Observable<Sucursal[]> {
-    return this.sucursalRepository.getSucursales();
+  getSucursales(): Observable<Array<Sucursal>> {
+    return this.http.get<Array<Sucursal>>(this.baseUrl);
   }
+
+  getSucursal(idSucursal: number): Observable<Sucursal> {
+    return this.http.get<Sucursal>(`${this.baseUrl}/${idSucursal}`);
+  }
+
+  set selectedSucursalId(sucursalId: number) {
+    this.storageService.setItem(STORAGE_SUCURSAL_ID_KEY, sucursalId);
+    this.selectedSucursalIdSubject.next(sucursalId);
+  }
+
+  get selectedSucursalId(): number | null {
+    return this.storageService.getItem(STORAGE_SUCURSAL_ID_KEY);
+  }
+  
 }

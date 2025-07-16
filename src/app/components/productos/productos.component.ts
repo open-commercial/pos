@@ -1,50 +1,54 @@
 import { debounce, finalize, fromEvent, of, timer } from 'rxjs';
 import { BusquedaProductoCriteria } from './../../models/criteria/busqueda-producto-criteria';
-import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { LoadingOverlayService } from 'src/app/services/loading-overlay.service';
 import { ProductoService } from 'src/app/services/producto.service';
 import { SucursalService } from 'src/app/services/sucursal.service';
 import { Producto } from 'src/app/models/producto';
 import { CantidadEnSucursal } from "src/app/models/cantidad-en-sucursal";
+import { DecimalPipe } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faMagnifyingGlass, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 const PRODUCTOS_INPUT_TEXT_KEY = 'productosInputText';
 
 @Component({
-    selector: 'app-productos',
-    templateUrl: './productos.component.html',
-    styleUrls: ['./productos.component.scss'],
-    standalone: false
+  selector: 'app-productos',
+  templateUrl: './productos.component.html',
+  styleUrls: ['./productos.component.scss'],
+  imports: [DecimalPipe, FontAwesomeModule]
 })
 export class ProductosComponent implements OnInit, AfterViewInit {
-  infinteSrollPage = 0;
-  isLastPage = true;
 
+  icons = {
+    magnifyingGlass: faMagnifyingGlass,
+    xMark: faXmark
+  }
+  sucursalService = inject(SucursalService);
+  productoService = inject(ProductoService);
+  loadingOverlayService = inject(LoadingOverlayService);
+  infiniteSrollPage = 0;
+  isLastPage = true;
   private readonly debounceTimeMs = 750;
   inputText = sessionStorage.getItem(PRODUCTOS_INPUT_TEXT_KEY) ?? '';
-
   productos: Producto[] = [];
-
-  @ViewChild('searchInput') searchInput: ElementRef<HTMLInputElement>|undefined;
-
-  @HostListener('document:scroll', ['$event'])
-  public onViewportScroll() {
-    const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
-    if (window.scrollY >= scrollableHeight) {
-        if (!this.isLastPage) {
-          this.infinteSrollPage += 1;
-          this.getProductos();
-        }
-    }
-  }
-
-  constructor(private sucursalService: SucursalService,
-              private productoService: ProductoService,
-              private loadingOverlayService: LoadingOverlayService){}
+  @ViewChild('searchInput') searchInput: ElementRef<HTMLInputElement> | undefined;
 
   ngOnInit(): void {
     this.sucursalService.selectedSucursalId$.subscribe(() => {
       this.search(this.inputText);
     });
+  }
+
+  @HostListener('document:scroll', ['$event'])
+  public onViewportScroll() {
+    const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (window.scrollY >= scrollableHeight) {
+      if (!this.isLastPage) {
+        this.infiniteSrollPage += 1;
+        this.getProductos();
+      }
+    }
   }
 
   ngAfterViewInit(): void {
@@ -56,8 +60,7 @@ export class ProductosComponent implements OnInit, AfterViewInit {
         .subscribe(() => {
           const searchTerm = this.searchInput?.nativeElement.value ?? '';
           this.search(searchTerm);
-        })
-      ;
+        });
       this.searchInput.nativeElement.value = this.inputText;
     }
   }
@@ -65,7 +68,7 @@ export class ProductosComponent implements OnInit, AfterViewInit {
   private search(searchTerm: string) {
     sessionStorage.setItem(PRODUCTOS_INPUT_TEXT_KEY, searchTerm);
     this.inputText = searchTerm;
-    this.infinteSrollPage = 0;
+    this.infiniteSrollPage = 0;
     this.getProductos();
   }
 
@@ -78,20 +81,19 @@ export class ProductosComponent implements OnInit, AfterViewInit {
 
   getProductos() {
     const sucursalId = this.sucursalService.selectedSucursalId;
-
     if (sucursalId) {
       const criteria: BusquedaProductoCriteria = {
-        pagina: this.infinteSrollPage,
+        pagina: this.infiniteSrollPage,
         codigo: this.inputText,
         descripcion: this.inputText,
         ordenarPor: ['descripcion'],
         sentido: 'ASC'
       };
-      if (this.infinteSrollPage === 0) {
+      if (this.infiniteSrollPage === 0) {
         this.productos = [];
       }
       this.loadingOverlayService.activate();
-      this.productoService.getProductos(criteria, sucursalId)
+      this.productoService.buscar(criteria, sucursalId)
         .pipe(finalize(() => this.loadingOverlayService.deactivate()))
         .subscribe({
           next: data => {
@@ -99,15 +101,14 @@ export class ProductosComponent implements OnInit, AfterViewInit {
             this.isLastPage = data.last;
           },
           error: err => alert(err.error),
-        })
-      ;
+        });
     }
   }
 
   getCantidadDisponibleDeSurcusalSelecionada(p: Producto) {
-    const sucursalId = this.sucursalService.selectedSucursalId;        
+    const sucursalId = this.sucursalService.selectedSucursalId;
     const aux: Array<CantidadEnSucursal> = p.cantidadEnSucursales.filter(c => c.idSucursal === sucursalId);
-    return aux.length ? aux[0].cantidad : 0;    
+    return aux.length ? aux[0].cantidad : 0;
   }
 }
 

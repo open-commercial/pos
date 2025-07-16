@@ -7,14 +7,18 @@
     width: 2.2rem;
     height: 2.2rem;
   }
+
   .nav-item-custom {
     max-width: 100%;
+
     @include media-breakpoint-up(sm) {
       max-width: unset;
     }
   }
-  .dropdown-item.active, .dropdown-item:active {
+
+  .dropdown-item.active,
+  .dropdown-item:active {
     color: $body-color;
-    background-color: rgba(var(--bs-success-rgb),var(--bs-bg-opacity));
+    background-color: rgba(var(--bs-success-rgb), var(--bs-bg-opacity));
   }
 }

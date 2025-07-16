@@ -1,5 +1,7 @@
-<div class="app-loading-overlay" *ngIf="active">
+@if (active) {
+<div class="app-loading-overlay">
   <div class="h-100 d-flex flex-column justify-content-center align-items-center">
-    <fa-icon [icon]="['fas', 'spinner']" animation="spin" size="6x"></fa-icon>
+    <fa-icon [icon]="icons.spinner" animation="spin" size="6x"></fa-icon>
   </div>
 </div>
+}

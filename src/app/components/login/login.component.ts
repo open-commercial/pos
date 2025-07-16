@@ -1,9 +1,12 @@
 import { LoadingOverlayService } from './../../services/loading-overlay.service';
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, debounceTime } from 'rxjs';
 import { AuthService, Credential } from 'src/app/services/auth.service';
+import { CommonModule } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faUser, faKey } from '@fortawesome/free-solid-svg-icons';
 
 interface LoginForm {
   username: FormControl<string>;
@@ -11,37 +14,41 @@ interface LoginForm {
 }
 
 @Component({
-    selector: 'app-login',
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.scss'],
-    standalone: false
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
+  imports: [CommonModule, ReactiveFormsModule, NgbAlert, FontAwesomeModule]
 })
 export class LoginComponent implements OnInit, AfterViewInit {
+
+  icons = {
+    user: faUser,
+    key: faKey
+  }
+  fb = inject(FormBuilder);
+  authService = inject(AuthService);
+  loadingOverlayService = inject(LoadingOverlayService);
   submitted = false;
-  form: FormGroup<LoginForm>|null = null;
-
-  private pError = new Subject<string>();
+  form: FormGroup<LoginForm> | null = null;
+  private readonly pError = new Subject<string>();
   errorMessage = '';
-
-  @ViewChild('usernameInput', { static: false }) usernameInput: ElementRef<HTMLInputElement>|undefined;
-  @ViewChild('errorAlert', { static: false }) errorAlert: NgbAlert|undefined;
-
-  constructor(private fb: FormBuilder,
-              private authService: AuthService,
-              private loadingOverlayService: LoadingOverlayService) {}
+  @ViewChild('usernameInput', { static: false }) usernameInput: ElementRef<HTMLInputElement> | undefined;
+  @ViewChild('errorAlert', { static: false }) errorAlert: NgbAlert | undefined;
 
   ngOnInit(): void {
     this.createForm();
     this.pError.subscribe(error => this.errorMessage = error);
     this.pError.pipe(debounceTime(5000)).subscribe(() => {
-			if (this.errorAlert) {
-				this.errorAlert.close();
-			}
-		});
+      if (this.errorAlert) {
+        this.errorAlert.close();
+      }
+    });
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => { this.usernameFocus(); }, 1000);
+    setTimeout(() => {
+      this.usernameFocus();
+    }, 1000);
   }
 
   private usernameFocus(): void {
@@ -55,12 +62,13 @@ export class LoginComponent implements OnInit, AfterViewInit {
     });
   }
 
-  get f() { return this.form?.controls; }
+  get f() {
+    return this.form?.controls;
+  }
 
   submit(): void {
     this.submitted = true;
-    const credencial: Credential|undefined = this.form?.value as Credential;
-
+    const credencial: Credential | undefined = this.form?.value as Credential;
     if (this.form?.valid && credencial) {
       this.authService.login(
         credencial,

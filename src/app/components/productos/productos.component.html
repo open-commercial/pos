@@ -1,31 +1,31 @@
 <div class="container-xxl app-productos">
   <div class="search-container">
-      <div class="input-group">
-        <span class="input-group-text manifying-glass-container">
-          <fa-icon [icon]="['fas', 'magnifying-glass']"></fa-icon>
-        </span>
-        <input
-          id="search-input"
-          type="text" class="form-control" placeholder="Buscar un producto..."
-          #searchInput
-        >
-        <button class="btn btn-light btn-times" type="button" (click)="clearInput()" [disabled]="inputText === ''">
-          <fa-icon [icon]="['fas', 'xmark']"></fa-icon>
-        </button>
-      </div>
+    <div class="input-group">
+      <span class="input-group-text manifying-glass-container">
+        <fa-icon [icon]="icons.magnifyingGlass"></fa-icon>
+      </span>
+      <input id="search-input" type="text" class="form-control" placeholder="Buscar un producto..." #searchInput>
+      <button class="btn btn-light btn-times" type="button" (click)="clearInput()" [disabled]="inputText === ''">
+        <fa-icon [icon]="icons.xMark"></fa-icon>
+      </button>
+    </div>
   </div>
-  <div id="productos" *ngIf="productos.length">
-    <div class="producto shadow-sm d-flex flex-row align-items-center" *ngFor="let p of productos">
+  @if (productos.length) {
+  <div id="productos">
+    @for (p of productos; track p) {
+    <div class="producto shadow-sm d-flex flex-row align-items-center">
       <div class="img-container flex-shrink-0 flex-grow-0 me-2">
-        <img [src]="p.urlImagen ? p.urlImagen : 'assets/sin_imagen.png'" [alt]="'Imagen del producto' + p.codigo">        
+        <img [src]="p.urlImagen ? p.urlImagen : 'assets/sin_imagen.png'" [alt]="'Foto del producto'">
       </div>
       <div class="flex-fill d-flex flex-column flex-md-row align-items-md-center">
         <div class="w-100 pe-md-2 mb-2 mb-md-0">
-          <span class="small">{{ p.codigo }}</span><br>
+          <span class="small">
+            {{ p.codigo }}
+          </span><br>
           {{ p.descripcion }}
         </div>
         <div class="precio fw-bold w-md-50 text-md-center px-md-2 mb-2 mb-md-0">
-          {{ p.precioLista | currency:'ARS':'symbol':'1.0-2'  }}
+          ${{ p.precioLista | number: '1.0-2' }}
         </div>
         <div class="stock w-md-50 text-md-center">
           <span class="d-md-none">Disponible: </span>
@@ -33,5 +33,7 @@
         </div>
       </div>
     </div>
+    }
   </div>
+  }
 </div>
