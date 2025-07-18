@@ -4,6 +4,7 @@ import { Injectable, signal } from '@angular/core';
   providedIn: 'root'
 })
 export class LoadingOverlayService {
+  
   private readonly activeSignal = signal(false);
   private count = 0;
 

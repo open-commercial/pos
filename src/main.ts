@@ -1,9 +1,19 @@
-/// <reference types="@angular/localize" />
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
+import { routes } from './app/routes';
+import { provideRouter } from '@angular/router';
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './app/interceptors/auth.interceptor';
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+registerLocaleData(localeEs);
 
-import { AppModule } from './app/app.module';
-
-
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+bootstrapApplication(AppComponent, {
+  providers: [
+    provideRouter(routes),
+    { provide: LOCALE_ID, useValue: 'es-ES' },
+    provideHttpClient(withInterceptors([authInterceptor]))
+  ]
+});
