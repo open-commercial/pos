@@ -1,12 +1,15 @@
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/mixins";
-
 .app-productos {
+
   .search-container {
     display: flex;
+    align-items: center;
     justify-content: center;
     margin: 1rem 0;
+
+    img.logo {
+      width: 2.2rem;
+      height: 2.2rem;
+    }
 
     .input-group {
       $border-radius: 1.5rem;
@@ -43,6 +46,15 @@
         border-bottom-right-radius: $border-radius;
       }
     }
+
+    .menu-items {
+      display: flex;
+    }
+  }
+
+  .dropdown-item.active, .dropdown-item:active {
+    //color: $body-color;
+    background-color: rgba(var(--bs-success-rgb), var(--bs-bg-opacity));
   }
 
   input#search-input {
@@ -78,9 +90,9 @@
       -moz-border-radius: $border-radius;
       border-radius: $border-radius;
 
-      @include media-breakpoint-up(md) {
+      /*@include media-breakpoint-up(md) {
         font-size: 1.2rem;
-      }
+      }*/
 
       .img-container {
         display: flex;
@@ -89,10 +101,10 @@
         width: 5rem;
         height: 5rem;
 
-        @include media-breakpoint-up(md) {
+        /*@include media-breakpoint-up(md) {
           width: 7rem;
           height: 7rem;
-        }
+        }*/
 
         background-color: white;
         -webkit-border-radius: $border-radius;

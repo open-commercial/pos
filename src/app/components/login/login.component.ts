@@ -1,7 +1,6 @@
 import { LoadingOverlayService } from './../../services/loading-overlay.service';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgbAlert } from '@ng-bootstrap/ng-bootstrap';
 import { Subject, debounceTime } from 'rxjs';
 import { AuthService, Credential } from 'src/app/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -17,7 +16,7 @@ interface LoginForm {
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  imports: [CommonModule, ReactiveFormsModule, NgbAlert, FontAwesomeModule]
+  imports: [CommonModule, ReactiveFormsModule, FontAwesomeModule]
 })
 export class LoginComponent implements OnInit, AfterViewInit {
 
@@ -33,15 +32,15 @@ export class LoginComponent implements OnInit, AfterViewInit {
   private readonly pError = new Subject<string>();
   errorMessage = '';
   @ViewChild('usernameInput', { static: false }) usernameInput: ElementRef<HTMLInputElement> | undefined;
-  @ViewChild('errorAlert', { static: false }) errorAlert: NgbAlert | undefined;
+  //@ViewChild('errorAlert', { static: false }) errorAlert: NgbAlert | undefined;
 
   ngOnInit(): void {
     this.createForm();
     this.pError.subscribe(error => this.errorMessage = error);
     this.pError.pipe(debounceTime(5000)).subscribe(() => {
-      if (this.errorAlert) {
+      /*if (this.errorAlert) {
         this.errorAlert.close();
-      }
+      }*/
     });
   }
 
@@ -73,7 +72,9 @@ export class LoginComponent implements OnInit, AfterViewInit {
       this.authService.login(
         credencial,
         () => this.loadingOverlayService.activate(),
-        () => { this.authService.getLoggedInUsuario()?.subscribe(); },
+        () => {
+          this.authService.getLoggedInUsuario()?.subscribe();
+        },
         (err: string) => {
           this.pError.next(err);
           this.usernameFocus();

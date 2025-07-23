@@ -1,12 +1,13 @@
 import { Component, AfterViewInit, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
-import { NavbarComponent } from '../navbar/navbar.component';
+import { ProductosComponent } from "../productos/productos.component";
+import { CheckoutComponent } from "../checkout/checkout.component";
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  imports: [RouterOutlet, NavbarComponent],
+  styleUrls: ['./home.component.scss'],
+  imports: [ProductosComponent, CheckoutComponent]
 })
 export class HomeComponent implements AfterViewInit {
 

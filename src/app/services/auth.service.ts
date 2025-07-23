@@ -20,9 +20,7 @@ export interface Credential {
 const loginUrl = environment.apiUrl + '/api/v1/login';
 const logoutUrl = environment.apiUrl + '/api/v1/logout';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
 
   http = inject(HttpClient);
@@ -52,12 +50,18 @@ export class AuthService {
     if (this.isAuthenticated()) { return; }
     if (typeof before === 'function') { before(); }
     this.http.post(loginUrl, credencial, { responseType: 'text' })
-      .pipe(finalize(() => { if (typeof done === 'function') { done(); } }))
+      .pipe(finalize(() => {
+        if (typeof done === 'function') {
+          done();
+        }
+      }))
       .subscribe({
         next: token => {
           this.storageService.setItem(STORAGE_AUTH_TOKEN_KEY, token);
-          if (typeof success === 'function') { success(); }
-          this.router.navigate(['pos']);
+          if (typeof success === 'function') {
+            success();
+          }
+          this.router.navigate(['home']);
         },
         error: (err) => {
           if (typeof error === 'function') {
@@ -86,8 +90,7 @@ export class AuthService {
         },
         error: (err) => { if (typeof error === 'function') { error(err) } },
         complete: () => { if (typeof done === 'function') { done(); } }
-      })
-      ;
+      });
   }
 
   cleanAccessTokenInLocalStorage() {
@@ -109,15 +112,18 @@ export class AuthService {
 
   private getLoggedInIdUsuario(): number | null {
     const token = this.getToken();
-    if (!token) { return null; }
-
+    if (!token) {
+      return null;
+    }
     const decodedToken = this.jwtHelper.decodeToken(token);
     return decodedToken.idUsuario;
   }
 
   getLoggedInUsuario(): Observable<Usuario> | null {
     const idUsuario = this.getLoggedInIdUsuario();
-    if (idUsuario === null) { return null; }
+    if (idUsuario === null) {
+      return null;
+    }
     return this.usuarioService.getUsuario(idUsuario)
       .pipe(tap(u => {
         this.user = u;

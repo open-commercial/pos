@@ -38,7 +38,9 @@ export class StorageService {
   }
 
   private decrypt(data: string|null) {
-    if (data === null || data === undefined) { return null; }
+    if (data === null || data === undefined) {
+      return null;
+    }
     const bytes = crypto.AES.decrypt(data, StorageService.getSK());
     return JSON.parse(bytes.toString(crypto.enc.Utf8));
   }

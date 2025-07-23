@@ -4,9 +4,9 @@
     @if (form) {
     <form [formGroup]="form" (ngSubmit)="submit()" class="text-start">
       @if (errorMessage) {
-      <ngb-alert #errorAlert type="danger" (closed)="errorMessage=''" class="text-center text-md-start">
+      <!--ngb-alert #errorAlert type="danger" (closed)="errorMessage=''" class="text-center text-md-start">
         {{ errorMessage }}
-      </ngb-alert>
+      </ngb-alert-->
       }
       <div class="input-group mb-3 has-validation">
         <label class="input-group-text" for="username">

@@ -1,6 +1,6 @@
 import { bootstrapApplication } from '@angular/platform-browser';
+import { routes } from './routes';
 import { AppComponent } from './app/app.component';
-import { routes } from './app/routes';
 import { provideRouter } from '@angular/router';
 import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';

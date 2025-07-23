@@ -1,5 +1,10 @@
-<div class="container-xxl app-productos">
+<div class="app-productos">
   <div class="search-container">
+
+    <a routerLink="/home">
+      <img class="logo me-2" src="assets/logo-opensource.png" alt="Logo de POS">
+    </a>
+
     <div class="input-group">
       <span class="input-group-text manifying-glass-container">
         <fa-icon [icon]="icons.magnifyingGlass"></fa-icon>
@@ -9,6 +14,43 @@
         <fa-icon [icon]="icons.xMark"></fa-icon>
       </button>
     </div>
+
+    <div class="menu-items">
+      @if (usuario && sucursales.length) {
+      <div ngbDropdown>
+        <button class="nav-link text-truncate" ngbDropdownToggle data-bs-toggle="dropdown">
+          <fa-icon [icon]="icons.store"></fa-icon>
+        </button>
+        <ul ngbDropdownMenu>
+          <h6 class="dropdown-header">Sucursales</h6>
+          @for (s of sucursales; track s) {
+          <li>
+            <a class="dropdown-item pointer-cursor" (click)="selectSucursal(s)"
+              [ngClass]="{ 'active' : selectedSucursal?.idSucursal === s.idSucursal }">
+              <fa-icon [icon]="icons.store"></fa-icon>
+              {{ s.nombre }}
+            </a>
+          </li>
+          }
+        </ul>
+      </div>
+      <div ngbDropdown>
+        <button class="nav-link text-truncate" ngbDropdownToggle data-bs-toggle="dropdown">
+          <fa-icon [icon]="icons.user"></fa-icon>
+        </button>
+        <ul ngbDropdownMenu>
+          <h6 class="dropdown-header">{{ usuario.nombre }} {{ usuario.apellido }}</h6>
+          <li>
+            <a class="dropdown-item pointer-cursor" (click)="logout()">
+              <fa-icon [icon]="icons.rightFromBracket"></fa-icon>
+              Salir
+            </a>
+          </li>
+        </ul>
+      </div>
+      }
+    </div>
+
   </div>
   @if (productos.length) {
   <div id="productos">

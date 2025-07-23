@@ -133,7 +133,7 @@
       "type": "service"
     },
     "@schematics/angular:guard": {
-      "typeSeparator": "."
+      "typeSeparator": "guard"
     },
     "@schematics/angular:interceptor": {
       "typeSeparator": "."

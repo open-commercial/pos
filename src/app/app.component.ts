@@ -5,7 +5,6 @@ import { LoadingOverlayComponent } from './components/loading-overlay/loading-ov
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.scss'],
     imports: [RouterOutlet, LoadingOverlayComponent]
 })
 export class AppComponent { }
