@@ -5,19 +5,13 @@ import { environment } from 'src/environments/environment';
 import { StorageService } from './storage.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { Router } from '@angular/router';
-import { finalize, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 import { UsuarioService } from './usuario.service';
 import { SucursalService } from './sucursal.service';
 
 export const STORAGE_AUTH_TOKEN_KEY = 'token';
 
-export interface Credential {
-  username: string;
-  password: string;
-}
-
-const loginUrl = environment.apiUrl + '/api/v1/login';
 const logoutUrl = environment.apiUrl + '/api/v1/logout';
 
 @Injectable({ providedIn: 'root' })
@@ -39,38 +33,17 @@ export class AuthService {
   }
   private readonly userSubjet = new Subject<Usuario>();
   user$ = this.userSubjet.asObservable();
+  urlLogin = environment.apiUrl + '/api/v1/login';
+  urlLogout = environment.apiUrl + '/api/v1/logout';
 
-  login(
-    credencial: Credential,
-    before: (() => void) | null = null,
-    success: (() => void) | null = null,
-    error: ((error: string) => void) | null = null,
-    done: (() => void) | null = null,
-  ) {
-    if (this.isAuthenticated()) { return; }
-    if (typeof before === 'function') { before(); }
-    this.http.post(loginUrl, credencial, { responseType: 'text' })
-      .pipe(finalize(() => {
-        if (typeof done === 'function') {
-          done();
-        }
-      }))
-      .subscribe({
-        next: token => {
+  login(username: string, password: string) {
+    const credential = { username: username, password: password };
+    return this.http.post(this.urlLogin, credential, { responseType: 'text' })
+      .pipe(
+        tap((token) => {
           this.storageService.setItem(STORAGE_AUTH_TOKEN_KEY, token);
-          if (typeof success === 'function') {
-            success();
-          }
-          this.router.navigate(['home']);
-        },
-        error: (err) => {
-          if (typeof error === 'function') {
-            const msjError = err.status === 0 ? 'Servicio no disponible :(' : err.error;
-            error(msjError);
-          }
-        }
-      })
-      ;
+        })
+      );
   }
 
   logout(

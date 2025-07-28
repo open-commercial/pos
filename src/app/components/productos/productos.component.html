@@ -7,11 +7,11 @@
 
     <div class="input-group">
       <span class="input-group-text manifying-glass-container">
-        <fa-icon [icon]="icons.magnifyingGlass"></fa-icon>
+        <!--fa-icon [icon]="icons.magnifyingGlass"></fa-icon-->
       </span>
       <input id="search-input" type="text" class="form-control" placeholder="Buscar un producto..." #searchInput>
       <button class="btn btn-light btn-times" type="button" (click)="clearInput()" [disabled]="inputText === ''">
-        <fa-icon [icon]="icons.xMark"></fa-icon>
+        <!--fa-icon [icon]="icons.xMark"></fa-icon-->
       </button>
     </div>
 
@@ -19,7 +19,7 @@
       @if (usuario && sucursales.length) {
       <div ngbDropdown>
         <button class="nav-link text-truncate" ngbDropdownToggle data-bs-toggle="dropdown">
-          <fa-icon [icon]="icons.store"></fa-icon>
+          <!--fa-icon [icon]="icons.store"></fa-icon-->
         </button>
         <ul ngbDropdownMenu>
           <h6 class="dropdown-header">Sucursales</h6>
@@ -27,7 +27,7 @@
           <li>
             <a class="dropdown-item pointer-cursor" (click)="selectSucursal(s)"
               [ngClass]="{ 'active' : selectedSucursal?.idSucursal === s.idSucursal }">
-              <fa-icon [icon]="icons.store"></fa-icon>
+              <!--fa-icon [icon]="icons.store"></fa-icon-->
               {{ s.nombre }}
             </a>
           </li>
@@ -36,13 +36,13 @@
       </div>
       <div ngbDropdown>
         <button class="nav-link text-truncate" ngbDropdownToggle data-bs-toggle="dropdown">
-          <fa-icon [icon]="icons.user"></fa-icon>
+          <!--fa-icon [icon]="icons.user"></fa-icon-->
         </button>
         <ul ngbDropdownMenu>
           <h6 class="dropdown-header">{{ usuario.nombre }} {{ usuario.apellido }}</h6>
           <li>
             <a class="dropdown-item pointer-cursor" (click)="logout()">
-              <fa-icon [icon]="icons.rightFromBracket"></fa-icon>
+              <!--fa-icon [icon]="icons.rightFromBracket"></fa-icon-->
               Salir
             </a>
           </li>

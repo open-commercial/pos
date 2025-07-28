@@ -1,18 +1,23 @@
+:host {
+  display: grid;
+  place-items: center;
+  background-color: #E0E0E0;
+  height: 100%;
+}
+
 .app-login {
+  width: 100%;
+  max-width: 350px;
+  text-align: center;
+  background-color: #E0E0E0;
+
   .logo {
-    width: 8rem;
-    /*@include media-breakpoint-up(md) {
-      width: 10rem;
-    }*/
-    height: auto;
+    width: 15rem;
   }
 
-  .login-container {
-    width: 100%;
-    max-width: 25rem;
-    /*@include media-breakpoint-up(md) {
-      max-width: 28rem;
-      height: 60%;
-    }*/
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
   }
 }

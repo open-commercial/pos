@@ -7,8 +7,6 @@ import { SucursalService } from 'src/app/services/sucursal.service';
 import { Producto } from 'src/app/models/producto';
 import { CantidadEnSucursal } from "src/app/models/cantidad-en-sucursal";
 import { CommonModule, DecimalPipe } from '@angular/common';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { faMagnifyingGlass, faXmark, faUser, faStore, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { Usuario } from 'src/app/models/usuario';
 import { Sucursal } from 'src/app/models/sucursal';
 import { AuthService } from 'src/app/services/auth.service';
@@ -22,20 +20,12 @@ const PRODUCTOS_INPUT_TEXT_KEY = 'productosInputText';
   styleUrls: ['./productos.component.scss'],
   imports: [
     DecimalPipe,
-    FontAwesomeModule,
     CommonModule,
     RouterLink
   ]
 })
 export class ProductosComponent implements OnInit, AfterViewInit {
 
-  icons = {
-    magnifyingGlass: faMagnifyingGlass,
-    xMark: faXmark,
-    user: faUser,
-    store: faStore,
-    rightFromBracket: faRightFromBracket
-  }
   authService = inject(AuthService);
   sucursalService = inject(SucursalService);
   productoService = inject(ProductoService);

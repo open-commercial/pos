@@ -1,47 +1,29 @@
-<div class="app-login h-100 d-flex flex-column justify-content-center align-items-center">
-  <div class="login-container p-4 p-md-5 m-3 m-md-0 text-center">
-    <img class="logo img-fluid d-inline-block mb-5" src="assets/logo-opensource.png" alt="Logo de POS">
-    @if (form) {
-    <form [formGroup]="form" (ngSubmit)="submit()" class="text-start">
-      @if (errorMessage) {
-      <!--ngb-alert #errorAlert type="danger" (closed)="errorMessage=''" class="text-center text-md-start">
-        {{ errorMessage }}
-      </ngb-alert-->
-      }
-      <div class="input-group mb-3 has-validation">
-        <label class="input-group-text" for="username">
-          <fa-icon [icon]="icons.user"></fa-icon>
-          <span class="ms-1 visually-hidden">Usuario</span>
-        </label>
-        <input #usernameInput type="text" class="form-control" id="username" formControlName="username"
-          [ngClass]="{ 'is-invalid': submitted && !!f && f.username.errors }">
-        @if (submitted && !!f && f.username.errors) {
-        <div class="invalid-feedback">
-          @if (!!f && f.username.errors['required']) {
-          <div>Requerido</div>
-          }
-        </div>
-        }
-      </div>
-      <div class="input-group mb-3 has-validation">
-        <label class="input-group-text" for="password">
-          <fa-icon [icon]="icons.key"></fa-icon>
-          <span class="ms-1 visually-hidden">Contraseña</span>
-        </label>
-        <input type="password" class="form-control" id="password" formControlName="password"
-          [ngClass]="{ 'is-invalid': submitted && !!f && f.password.errors }">
-        @if (submitted && !!f && f.password.errors) {
-        <div class="invalid-feedback">
-          @if (!!f && f.password.errors['required']) {
-          <div>Requerido</div>
-          }
-        </div>
-        }
-      </div>
-      <div class="d-grid gap-2 mt-4">
-        <button type="submit" class="btn btn-success">Ingresar</button>
-      </div>
-    </form>
-    }
-  </div>
+<div class="app-login">
+  <img class="logo" src="assets/sin_imagen.png" alt="Logo">
+
+  <form [formGroup]="loginForm" (ngSubmit)="submit()">
+    <mat-form-field>
+      <mat-label>Email o Usuario</mat-label>
+      <input matInput formControlName="username"/>
+      <mat-error *ngIf="loginForm.controls.username.hasError('required') && loginForm.controls.username.touched">
+        Requerido
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Contraseña</mat-label>
+      <input matInput type="password" formControlName="password">
+      <mat-error *ngIf="loginForm.controls.password.hasError('required') && loginForm.controls.password.touched">
+        Requerido
+      </mat-error>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || loading()">      
+      @if (loading()) {
+        <mat-spinner  diameter="20" class="spinner"></mat-spinner>
+      } @else {
+        Ingresar
+      }      
+    </button>
+  </form>
 </div>
