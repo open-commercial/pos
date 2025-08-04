@@ -10,7 +10,15 @@ import { CommonModule, DecimalPipe } from '@angular/common';
 import { Usuario } from 'src/app/models/usuario';
 import { Sucursal } from 'src/app/models/sucursal';
 import { AuthService } from 'src/app/services/auth.service';
-import { RouterLink } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
+import { MenuDialogComponent } from '../menu-dialog/menu-dialog.component';
 
 const PRODUCTOS_INPUT_TEXT_KEY = 'productosInputText';
 
@@ -21,10 +29,21 @@ const PRODUCTOS_INPUT_TEXT_KEY = 'productosInputText';
   imports: [
     DecimalPipe,
     CommonModule,
-    RouterLink
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatMenuModule
   ]
 })
 export class ProductosComponent implements OnInit, AfterViewInit {
+
+  
+  value = '';
+  readonly dialog = inject(MatDialog);
+
 
   authService = inject(AuthService);
   sucursalService = inject(SucursalService);
@@ -34,12 +53,22 @@ export class ProductosComponent implements OnInit, AfterViewInit {
   isLastPage = true;
   private readonly debounceTimeMs = 750;
   inputText = sessionStorage.getItem(PRODUCTOS_INPUT_TEXT_KEY) ?? '';
-  productos: Producto[] = [];
+  products: Producto[] = [];
   sucursales: Sucursal[] = [];
   usuario: Usuario | null = null;
   selectedSucursal: Sucursal | null = null;
   private readonly usuarioSeleccionadoSubscription = new Subscription();
   @ViewChild('searchInput') searchInput: ElementRef<HTMLInputElement> | undefined;
+
+  increaseQuantity(producto: Producto) { }
+
+  decreaseQuantity(producto: Producto) { }
+
+  openDialog() {
+    const dialogRef = this.dialog.open(MenuDialogComponent, {restoreFocus: false});
+    dialogRef.afterClosed().subscribe(() => console.log('Dialog was closed'));
+  }
+
 
   ngOnInit(): void {
     this.loadingOverlayService.activate();
@@ -100,13 +129,6 @@ export class ProductosComponent implements OnInit, AfterViewInit {
     this.getProductos();
   }
 
-  clearInput() {
-    if (this.searchInput) {
-      this.searchInput.nativeElement.value = '';
-      this.search('');
-    }
-  }
-
   getProductos() {
     const sucursalId = this.sucursalService.selectedSucursalId;
     if (sucursalId) {
@@ -118,14 +140,14 @@ export class ProductosComponent implements OnInit, AfterViewInit {
         sentido: 'ASC'
       };
       if (this.infiniteSrollPage === 0) {
-        this.productos = [];
+        this.products = [];
       }
       this.loadingOverlayService.activate();
       this.productoService.buscar(criteria, sucursalId)
         .pipe(finalize(() => this.loadingOverlayService.deactivate()))
         .subscribe({
           next: data => {
-            this.productos = this.productos.concat(data.content);
+            this.products = this.products.concat(data.content);
             this.isLastPage = data.last;
           },
           error: err => alert(err.error),

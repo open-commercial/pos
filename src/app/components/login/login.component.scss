@@ -1,15 +1,13 @@
 :host {
   display: grid;
   place-items: center;
-  background-color: #E0E0E0;
   height: 100%;
 }
 
 .app-login {
   width: 100%;
   max-width: 350px;
-  text-align: center;
-  background-color: #E0E0E0;
+  text-align: center;  
 
   .logo {
     width: 15rem;

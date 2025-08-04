@@ -1,3 +1,30 @@
-<div class="app-checkout cart">
-    
-</div>
+<div class="app-checkout">
+  <div class="checkout-header">
+    <span class="customer-name">Consumidor Final</span>
+    <button matIconButton (click)="onSearch()">
+      <mat-icon>search</mat-icon>
+    </button>
+  </div>
+
+  <!--div class="checkout-list">
+    @for (item of items; track item) {
+    <div class="checkout-item">
+      <span class="checkout-qty"><b>{{ item.qty }}x</b></span>
+      <span class="checkout-desc">{{ item.desc }}</span>
+      <span class="checkout-price"><b>${{ item.price }}</b></span>
+      <button matIconButton (click)="removeItem(item)">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+    }
+  </div-->
+
+  <!--div class="checkout-total">
+    <span class="total-label"><b>TOTAL</b></span>
+    <span class="total-value"><b>${{ total }}</b></span>
+    <button matButton="filled" class="checkout-btn" (click)="finalize()">
+      <mat-icon>check</mat-icon>
+      Finalizar
+    </button>
+  </div>
+</div-->

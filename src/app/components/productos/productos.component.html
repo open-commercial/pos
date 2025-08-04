@@ -1,25 +1,34 @@
 <div class="app-productos">
+
   <div class="search-container">
-
-    <a routerLink="/home">
-      <img class="logo me-2" src="assets/logo-opensource.png" alt="Logo de POS">
-    </a>
-
-    <div class="input-group">
-      <span class="input-group-text manifying-glass-container">
-        <!--fa-icon [icon]="icons.magnifyingGlass"></fa-icon-->
-      </span>
-      <input id="search-input" type="text" class="form-control" placeholder="Buscar un producto..." #searchInput>
-      <button class="btn btn-light btn-times" type="button" (click)="clearInput()" [disabled]="inputText === ''">
-        <!--fa-icon [icon]="icons.xMark"></fa-icon-->
+    <img class="logo" src="assets/logo.png" alt="Logo" [matMenuTriggerFor]="menu" #menuTrigger>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="openDialog()">
+        <mat-icon>store</mat-icon>
+        <span>Cambiar Sucursal ({{ selectedSucursal?.nombre }})</span>
       </button>
-    </div>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Cerrar Sesión (Jhon Doe)</span>
+      </button>
+    </mat-menu>
 
-    <div class="menu-items">
+    <mat-form-field class="form-field">
+      <mat-label>Busca un producto...</mat-label>
+      <input matInput type="text" [(ngModel)]="value">
+      @if (value) {
+      <button matSuffix matIconButton aria-label="Clear" (click)="value=''">
+        <mat-icon>close</mat-icon>
+      </button>
+      }
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <!--div class="menu-items">
       @if (usuario && sucursales.length) {
       <div ngbDropdown>
         <button class="nav-link text-truncate" ngbDropdownToggle data-bs-toggle="dropdown">
-          <!--fa-icon [icon]="icons.store"></fa-icon-->
+          <fa-icon [icon]="icons.store"></fa-icon>
         </button>
         <ul ngbDropdownMenu>
           <h6 class="dropdown-header">Sucursales</h6>
@@ -27,7 +36,7 @@
           <li>
             <a class="dropdown-item pointer-cursor" (click)="selectSucursal(s)"
               [ngClass]="{ 'active' : selectedSucursal?.idSucursal === s.idSucursal }">
-              <!--fa-icon [icon]="icons.store"></fa-icon-->
+              <fa-icon [icon]="icons.store"></fa-icon>
               {{ s.nombre }}
             </a>
           </li>
@@ -36,46 +45,47 @@
       </div>
       <div ngbDropdown>
         <button class="nav-link text-truncate" ngbDropdownToggle data-bs-toggle="dropdown">
-          <!--fa-icon [icon]="icons.user"></fa-icon-->
+          <fa-icon [icon]="icons.user"></fa-icon>
         </button>
         <ul ngbDropdownMenu>
           <h6 class="dropdown-header">{{ usuario.nombre }} {{ usuario.apellido }}</h6>
           <li>
             <a class="dropdown-item pointer-cursor" (click)="logout()">
-              <!--fa-icon [icon]="icons.rightFromBracket"></fa-icon-->
+              <fa-icon [icon]="icons.rightFromBracket"></fa-icon>
               Salir
             </a>
           </li>
         </ul>
       </div>
       }
-    </div>
-
+    </div-->
   </div>
-  @if (productos.length) {
-  <div id="productos">
-    @for (p of productos; track p) {
-    <div class="producto shadow-sm d-flex flex-row align-items-center">
-      <div class="img-container flex-shrink-0 flex-grow-0 me-2">
-        <img [src]="p.urlImagen ? p.urlImagen : 'assets/sin_imagen.png'" [alt]="'Foto del producto'">
+  
+  <div class="products-container">
+    @for (producto of products; track producto) {
+    <mat-card class="product-card" appearance="filled">
+      <div class="product-content">
+        <div class="product-image">
+          <img [src]="producto.urlImagen ? producto.urlImagen : 'assets/sin_imagen.png'" alt="Foto">
+        </div>
+        <div class="product-info">
+          <div class="product-code">{{ producto.codigo }}</div>
+          <div class="product-description">{{ producto.descripcion }}</div>
+        </div>
+        <div class="product-price"><b>${{ producto.precioLista | number: '1.0-2' }}</b></div>
+        <div class="product-stock">{{ getCantidadDisponibleDeSurcusalSelecionada(producto) }} {{ producto.nombreMedida }}</div>
+        <div class="product-quantity">
+          <button mat-icon-button (click)="decreaseQuantity(producto)">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <mat-form-field>
+            <input matInput type="text" [value]="0" />
+          </mat-form-field>
+          <button mat-icon-button (click)="increaseQuantity(producto)">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
       </div>
-      <div class="flex-fill d-flex flex-column flex-md-row align-items-md-center">
-        <div class="w-100 pe-md-2 mb-2 mb-md-0">
-          <span class="small">
-            {{ p.codigo }}
-          </span><br>
-          {{ p.descripcion }}
-        </div>
-        <div class="precio fw-bold w-md-50 text-md-center px-md-2 mb-2 mb-md-0">
-          ${{ p.precioLista | number: '1.0-2' }}
-        </div>
-        <div class="stock w-md-50 text-md-center">
-          <span class="d-md-none">Disponible: </span>
-          {{ getCantidadDisponibleDeSurcusalSelecionada(p) | number: '1.0-2' }} {{ p.nombreMedida }}
-        </div>
-      </div>
-    </div>
-    }
-  </div>
+    </mat-card>
   }
-</div>
+  </div>

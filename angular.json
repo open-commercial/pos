@@ -42,7 +42,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/theme-colors.scss"
             ],
             "scripts": [],
             "browser": "src/main.ts"
@@ -110,7 +111,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/theme-colors.scss"
             ],
             "scripts": []
           }

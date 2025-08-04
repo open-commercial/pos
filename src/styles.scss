@@ -4,10 +4,13 @@
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+@use 'src/theme-colors.scss' as theme-colors;
 
 html {
   @include mat.theme((
     color: (
+      //primary: theme-colors.$primary-palette,
+      //tertiary: theme-colors.$tertiary-palette
       primary: mat.$blue-palette,
       tertiary: mat.$blue-palette,
     ),
@@ -30,3 +33,4 @@ html {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+* { box-sizing: border-box; }

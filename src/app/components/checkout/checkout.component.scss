@@ -1,75 +1,82 @@
 .app-checkout {
-    .cart {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1rem;
-        border: 1px solid #333;
-        border-radius: 8px;
-        background: #fff;
+  display: flex;
+  flex-direction: column;
+  //box-sizing: border-box;
+  //padding: 1.5rem 1rem 1rem 1rem;
+  height: 100vh;
+  overflow: auto;
 
-        h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
+  .checkout-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2.5rem;
+    margin-top: 1.2rem;
 
-        .cart-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-            padding: 0.5rem 0;
-            border-bottom: 1px dashed #ccc;
-
-            span {
-                flex: 1;
-            }
-
-            strong {
-                flex-shrink: 0;
-                width: 60px;
-                text-align: right;
-            }
-
-            button {
-                background: none;
-                border: none;
-                font-size: 1.2rem;
-                cursor: pointer;
-                color: #b00;
-                padding: 0 0.25rem;
-
-                &:hover {
-                    color: red;
-                }
-            }
-        }
-
-        .total {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            font-size: 1.1rem;
-            padding-top: 0.5rem;
-            border-top: 2px solid #000;
-        }
+    .customer-name {
+      font-size: 2rem;
     }
+  }
 
-    .checkout {
-        margin-top: 1rem;
-        width: 100%;
-        padding: 1rem;
-        background: #000;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
+  .checkout-list {
+    display: flex;
+    flex-grow: 1;
+    //flex-shrink: 1;
+    //flex-basis: auto;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+
+    .checkout-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 1.25rem;
+
+      .checkout-qty {
+        min-width: 2.5rem;
         font-weight: bold;
-        cursor: pointer;
+      }
 
-        &:hover {
-            background: #333;
-        }
+      .checkout-desc {
+        //flex: auto;
+        //margin-left: 0.5rem;
+      }
+
+      .checkout-price {
+        min-width: 4rem;
+        text-align: right;
+        font-weight: bold;
+      }
     }
+  }
+
+  .checkout-total {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0 2rem 0;
+    font-size: 1.5rem;
+
+    .total-label {
+      font-weight: bold;
+    }
+
+    .total-value {
+      font-weight: bold;
+      font-size: 1.5rem;
+      margin-left: 2rem;
+    }
+
+    .checkout-btn {
+      font-size: 2rem;
+      height: 4.5rem;
+      line-height: 4.5rem;
+
+      mat-icon {
+        font-size: 2.5rem;
+        width: 2.5rem;
+      }
+    }
+  }
 }
