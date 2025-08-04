@@ -1,6 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatListModule } from '@angular/material/list';
+import { NotificationService } from 'src/app/services/notification.service';
+import { SearchCustomerDialogComponent } from '../search-customer-dialog/search-customer-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 interface CheckoutItem {
   qty: number;
@@ -12,9 +17,12 @@ interface CheckoutItem {
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss'],
-  imports: [MatIconModule, MatButtonModule]
+  imports: [MatIconModule, MatButtonModule, MatToolbarModule, MatListModule]
 })
 export class CheckoutComponent {
+
+  notificationService = inject(NotificationService);
+  readonly dialog = inject(MatDialog);
 
   items: CheckoutItem[] = [
     { qty: 3, desc: 'Abrelatas Uña Pata 506 Loekemeyer', price: 4500.50 },
@@ -46,6 +54,7 @@ export class CheckoutComponent {
 
   removeItem(item: CheckoutItem) {
     this.items = this.items.filter(i => i !== item);
+    this.notificationService.openSnackBar("Se quitó " + item.desc + " de la lista", '', 3000);
   }
 
   finalize() {
@@ -55,4 +64,9 @@ export class CheckoutComponent {
   onSearch() {
     alert('Buscar cliente');
   }
+
+  openDialog() {
+      const dialogRef = this.dialog.open(SearchCustomerDialogComponent, {restoreFocus: false});
+      dialogRef.afterClosed().subscribe(() => console.log('Search customer dialog was closed'));
+    }
 }

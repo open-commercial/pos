@@ -66,7 +66,7 @@ export class ProductosComponent implements OnInit, AfterViewInit {
 
   openDialog() {
     const dialogRef = this.dialog.open(MenuDialogComponent, {restoreFocus: false});
-    dialogRef.afterClosed().subscribe(() => console.log('Dialog was closed'));
+    dialogRef.afterClosed().subscribe(() => console.log('Menu dialog was closed'));
   }
 
 
