@@ -39,12 +39,7 @@ export class CheckoutComponent {
     { qty: 1, desc: 'Descripcion de producto 4', price: 3000 },
     { qty: 3, desc: 'Descripcion de producto 1', price: 4500 },
     { qty: 1, desc: 'Descripcion de producto 3', price: 1000 },
-    { qty: 2, desc: 'Descripcion de producto 2', price: 2000 },
-    { qty: 1, desc: 'Descripcion de producto 4', price: 3000 },
-    { qty: 3, desc: 'Descripcion de producto 1', price: 4500 },
-    { qty: 1, desc: 'Descripcion de producto 3', price: 1000 },
-    { qty: 2, desc: 'Descripcion de producto 2', price: 2000 },
-    { qty: 1, desc: 'Descripcion de producto 4', price: 3000 },
+    { qty: 2, desc: 'Descripcion de producto 2', price: 2000 },        
     { qty: 1, desc: 'Descripcion de producto 5', price: 5000 }
   ];
 
@@ -61,12 +56,9 @@ export class CheckoutComponent {
     alert('Compra finalizada');
   }
 
-  onSearch() {
-    alert('Buscar cliente');
-  }
-
   openDialog() {
-      const dialogRef = this.dialog.open(SearchCustomerDialogComponent, {restoreFocus: false});
-      dialogRef.afterClosed().subscribe(() => console.log('Search customer dialog was closed'));
-    }
+    const dialogRef = this.dialog.open(SearchCustomerDialogComponent, { restoreFocus: false });
+    dialogRef.afterClosed().subscribe(
+      () => this.notificationService.openSnackBar("Cliente seleccionado", '', 3500));
+  }
 }

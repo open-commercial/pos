@@ -23,6 +23,21 @@
     flex: 1 1 auto;
     gap: 0.5rem;
     overflow-y: auto;
+    justify-content: center;
+
+    .empty-message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      
+      .empty-icon {
+        font-size: 3rem;
+        width: 3rem;
+        height: 3rem;
+      }
+    }
 
     .checkout-item {
       flex: 0 0 auto;
@@ -33,6 +48,11 @@
       }
 
       .checkout-desc {
+        display: -webkit-box;
+        line-clamp: 3;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
         font-size: 1.2rem;
         text-wrap: auto;
         padding: 0 1rem;

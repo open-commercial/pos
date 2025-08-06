@@ -1,5 +1,5 @@
 import { debounce, finalize, fromEvent, of, Subscription, timer } from 'rxjs';
-import { BusquedaProductoCriteria } from './../../models/criteria/busqueda-producto-criteria';
+import { BusquedaProductoCriteria } from '../../models/criteria/busqueda-producto-criteria';
 import { AfterViewInit, Component, ElementRef, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { LoadingOverlayService } from 'src/app/services/loading-overlay.service';
 import { ProductoService } from 'src/app/services/producto.service';
@@ -18,14 +18,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
-import { MenuDialogComponent } from '../menu-dialog/menu-dialog.component';
+import { MatRippleModule } from '@angular/material/core';
+import { GlobalMenuDialogComponent } from '../global-menu-dialog/global-menu-dialog.component';
+import { NotificationService } from 'src/app/services/notification.service';
 
 const PRODUCTOS_INPUT_TEXT_KEY = 'productosInputText';
 
 @Component({
-  selector: 'app-productos',
-  templateUrl: './productos.component.html',
-  styleUrls: ['./productos.component.scss'],
+  selector: 'app-products',
+  templateUrl: './products.component.html',
+  styleUrls: ['./products.component.scss'],
   imports: [
     DecimalPipe,
     CommonModule,
@@ -35,14 +37,16 @@ const PRODUCTOS_INPUT_TEXT_KEY = 'productosInputText';
     MatButtonModule,
     MatIconModule,
     MatCardModule,
-    MatMenuModule
+    MatMenuModule,
+    MatRippleModule
   ]
 })
-export class ProductosComponent implements OnInit, AfterViewInit {
+export class ProductsComponent implements OnInit, AfterViewInit {
 
   
   value = '';
   readonly dialog = inject(MatDialog);
+  notificationService = inject(NotificationService);
 
 
   authService = inject(AuthService);
@@ -65,10 +69,9 @@ export class ProductosComponent implements OnInit, AfterViewInit {
   decreaseQuantity(producto: Producto) { }
 
   openDialog() {
-    const dialogRef = this.dialog.open(MenuDialogComponent, {restoreFocus: false});
-    dialogRef.afterClosed().subscribe(() => console.log('Menu dialog was closed'));
+    const dialogRef = this.dialog.open(GlobalMenuDialogComponent, {restoreFocus: false});
+    dialogRef.afterClosed().subscribe(() => this.notificationService.openSnackBar("Sucursal seleccionada", '', 3500));
   }
-
 
   ngOnInit(): void {
     this.loadingOverlayService.activate();

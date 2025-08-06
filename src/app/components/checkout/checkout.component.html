@@ -2,24 +2,33 @@
   <mat-toolbar class="checkout-header">
     <span class="customer-name"><b>Consumidor Final</b></span>
     <span class="spacer"></span>
-    <button matIconButton (click)="openDialog()" style="color: blue;">
+    <button matIconButton (click)="openDialog()">
       <mat-icon>person_search</mat-icon>
     </button>
   </mat-toolbar>
-  
-  <mat-toolbar class="checkout-list">
-    @for (item of items; track item) {
-    <mat-toolbar-row class="checkout-item">
-      <span class="checkout-qty">{{ item.qty }}x</span>
-      <span class="checkout-desc">{{ item.desc }}</span>
-      <span class="spacer"></span>
-      <span class="checkout-price">${{ item.price }}</span>
-      <button matIconButton (click)="removeItem(item)" style="color: blue;">
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-toolbar-row>
+
+  <div class="checkout-list">
+    @if (items.length === 0) {
+    <div class="empty-message">
+      <mat-icon class="empty-icon">format_list_bulleted</mat-icon>
+      <span>Agrega productos para verlos listados aquí</span>
+    </div>
+    } @else {
+    <mat-toolbar>
+      @for (item of items; track item) {
+      <mat-toolbar-row class="checkout-item">
+        <span class="checkout-qty">{{ item.qty }}x</span>
+        <span class="checkout-desc">{{ item.desc }}</span>
+        <span class="spacer"></span>
+        <span class="checkout-price">${{ item.price }}</span>
+        <button matIconButton (click)="removeItem(item)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-toolbar-row>
+      }
+    </mat-toolbar>
     }
-  </mat-toolbar>
+  </div>
 
   <div class="checkout-total">
     <div class="total-labels">
@@ -31,5 +40,4 @@
       <span>Finalizar</span>
     </button>
   </div>
-
 </div>

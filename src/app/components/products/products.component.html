@@ -1,4 +1,4 @@
-<div class="app-productos">
+<div class="app-products">
 
   <div class="search-container">
     <img class="logo" src="assets/logo.png" alt="Logo" [matMenuTriggerFor]="menu" #menuTrigger>
@@ -64,7 +64,7 @@
   <div class="products-container">
     @for (producto of products; track producto) {
     <mat-card class="product-card" appearance="filled">
-      <div class="product-content">
+      <div matRipple class="product-content">
         <div class="product-image">
           <img [src]="producto.urlImagen ? producto.urlImagen : 'assets/sin_imagen.png'" alt="Foto">
         </div>
