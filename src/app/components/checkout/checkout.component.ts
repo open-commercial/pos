@@ -6,6 +6,7 @@ import { MatListModule } from '@angular/material/list';
 import { NotificationService } from 'src/app/services/notification.service';
 import { SearchCustomerDialogComponent } from '../search-customer-dialog/search-customer-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { DecimalPipe } from '@angular/common';
 
 interface CheckoutItem {
   qty: number;
@@ -17,7 +18,7 @@ interface CheckoutItem {
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss'],
-  imports: [MatIconModule, MatButtonModule, MatToolbarModule, MatListModule]
+  imports: [MatIconModule, MatButtonModule, MatToolbarModule, MatListModule, DecimalPipe]
 })
 export class CheckoutComponent {
 
@@ -49,7 +50,7 @@ export class CheckoutComponent {
 
   removeItem(item: CheckoutItem) {
     this.items = this.items.filter(i => i !== item);
-    this.notificationService.openSnackBar("Se quitó " + item.desc + " de la lista", '', 3000);
+    this.notificationService.openSnackBar("Se quitó \"" + item.desc + "\" de la lista", '', 3000);
   }
 
   finalize() {

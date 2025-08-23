@@ -1,7 +1,7 @@
 import { debounce, finalize, fromEvent, of, Subscription, timer } from 'rxjs';
 import { BusquedaProductoCriteria } from '../../models/criteria/busqueda-producto-criteria';
-import { AfterViewInit, Component, ElementRef, HostListener, inject, OnInit, ViewChild } from '@angular/core';
-import { LoadingOverlayService } from 'src/app/services/loading-overlay.service';
+import { AfterViewInit, Component, ElementRef, HostListener, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { LoadingService } from 'src/app/services/loading.service';
 import { ProductoService } from 'src/app/services/producto.service';
 import { SucursalService } from 'src/app/services/sucursal.service';
 import { Producto } from 'src/app/models/producto';
@@ -19,10 +19,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatRippleModule } from '@angular/material/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GlobalMenuDialogComponent } from '../global-menu-dialog/global-menu-dialog.component';
 import { NotificationService } from 'src/app/services/notification.service';
-
-const PRODUCTOS_INPUT_TEXT_KEY = 'productosInputText';
 
 @Component({
   selector: 'app-products',
@@ -38,25 +37,22 @@ const PRODUCTOS_INPUT_TEXT_KEY = 'productosInputText';
     MatIconModule,
     MatCardModule,
     MatMenuModule,
-    MatRippleModule
+    MatRippleModule,
+    MatProgressSpinnerModule
   ]
 })
-export class ProductsComponent implements OnInit, AfterViewInit {
-
+export class ProductsComponent implements OnInit, OnDestroy, AfterViewInit {
   
-  value = '';
-  readonly dialog = inject(MatDialog);
   notificationService = inject(NotificationService);
-
-
   authService = inject(AuthService);
   sucursalService = inject(SucursalService);
   productoService = inject(ProductoService);
-  loadingOverlayService = inject(LoadingOverlayService);
+  loadingService = inject(LoadingService);
+  dialog = inject(MatDialog);
+  searchCriteria = '';
   infiniteSrollPage = 0;
   isLastPage = true;
   private readonly debounceTimeMs = 750;
-  inputText = sessionStorage.getItem(PRODUCTOS_INPUT_TEXT_KEY) ?? '';
   products: Producto[] = [];
   sucursales: Sucursal[] = [];
   usuario: Usuario | null = null;
@@ -68,15 +64,15 @@ export class ProductsComponent implements OnInit, AfterViewInit {
 
   decreaseQuantity(producto: Producto) { }
 
-  openDialog() {
+  openGlobalMenuDialog() {
     const dialogRef = this.dialog.open(GlobalMenuDialogComponent, {restoreFocus: false});
     dialogRef.afterClosed().subscribe(() => this.notificationService.openSnackBar("Sucursal seleccionada", '', 3500));
   }
 
   ngOnInit(): void {
-    this.loadingOverlayService.activate();
+    this.loadingService.activate();
     this.sucursalService.getSucursales()
-      .pipe(finalize(() => this.loadingOverlayService.deactivate()))
+      //.pipe(finalize(() => this.loadingService.deactivate()))
       .subscribe({
         next: sucursales => {
           this.sucursales = sucursales;
@@ -92,7 +88,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
       this.usuario = u;
     }));
     this.sucursalService.selectedSucursalId$.subscribe(() => {
-      this.search(this.inputText);
+      this.search(this.searchCriteria);
     });
   }
 
@@ -121,13 +117,12 @@ export class ProductsComponent implements OnInit, AfterViewInit {
           const searchTerm = this.searchInput?.nativeElement.value ?? '';
           this.search(searchTerm);
         });
-      this.searchInput.nativeElement.value = this.inputText;
+      this.searchInput.nativeElement.value = this.searchCriteria;
     }
   }
 
   private search(searchTerm: string) {
-    sessionStorage.setItem(PRODUCTOS_INPUT_TEXT_KEY, searchTerm);
-    this.inputText = searchTerm;
+    this.searchCriteria = searchTerm;
     this.infiniteSrollPage = 0;
     this.getProductos();
   }
@@ -137,17 +132,17 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     if (sucursalId) {
       const criteria: BusquedaProductoCriteria = {
         pagina: this.infiniteSrollPage,
-        codigo: this.inputText,
-        descripcion: this.inputText,
+        codigo: this.searchCriteria,
+        descripcion: this.searchCriteria,
         ordenarPor: ['descripcion'],
         sentido: 'ASC'
       };
       if (this.infiniteSrollPage === 0) {
         this.products = [];
       }
-      this.loadingOverlayService.activate();
+      this.loadingService.activate();
       this.productoService.buscar(criteria, sucursalId)
-        .pipe(finalize(() => this.loadingOverlayService.deactivate()))
+        .pipe(finalize(() => this.loadingService.deactivate()))
         .subscribe({
           next: data => {
             this.products = this.products.concat(data.content);
@@ -166,10 +161,10 @@ export class ProductsComponent implements OnInit, AfterViewInit {
 
   logout() {
     this.authService.logout(
-      () => this.loadingOverlayService.activate(),
+      () => this.loadingService.activate(),
       null,
       () => { alert('Error al salir') },
-      () => this.loadingOverlayService.deactivate()
+      () => this.loadingService.deactivate()
     );
   }
 

@@ -3,7 +3,7 @@
   <div class="search-container">
     <img class="logo" src="assets/logo.png" alt="Logo" [matMenuTriggerFor]="menu" #menuTrigger>
     <mat-menu #menu="matMenu">
-      <button mat-menu-item (click)="openDialog()">
+      <button mat-menu-item (click)="openGlobalMenuDialog()">
         <mat-icon>store</mat-icon>
         <span>Cambiar Sucursal ({{ selectedSucursal?.nombre }})</span>
       </button>
@@ -13,11 +13,11 @@
       </button>
     </mat-menu>
 
-    <mat-form-field class="form-field">
-      <mat-label>Busca un producto...</mat-label>
-      <input matInput type="text" [(ngModel)]="value">
-      @if (value) {
-      <button matSuffix matIconButton aria-label="Clear" (click)="value=''">
+    <mat-form-field appearance="outline" class="form-field">
+      <mat-label>Buscar productos</mat-label>
+      <input matInput type="text" [(ngModel)]="searchCriteria">
+      @if (searchCriteria) {
+      <button matSuffix matIconButton aria-label="Clear" (click)="searchCriteria=''" tabindex="-1">
         <mat-icon>close</mat-icon>
       </button>
       }
@@ -60,32 +60,40 @@
       }
     </div-->
   </div>
-  
+
   <div class="products-container">
-    @for (producto of products; track producto) {
-    <mat-card class="product-card" appearance="filled">
-      <div matRipple class="product-content">
-        <div class="product-image">
-          <img [src]="producto.urlImagen ? producto.urlImagen : 'assets/sin_imagen.png'" alt="Foto">
+    @if (loadingService.active()) {
+    <div class="spinner">
+      <mat-spinner></mat-spinner>
+    </div>
+    } @else {
+    @for (p of products; track p) {
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        <div class="product-content">
+          <div class="product-image">
+            <img mat-card-image [src]="p.urlImagen ? p.urlImagen : 'assets/sin_imagen.png'" alt="Foto">
+          </div>
+          <div class="product-info">
+            <div class="product-code">{{ p.codigo }}</div>
+            <div class="product-description">{{ p.descripcion }}</div>
+          </div>
+          <div class="product-price">${{ p.precioLista | number: '1.0-2' }}</div>
+          <div class="product-stock"> {{ getCantidadDisponibleDeSurcusalSelecionada(p) }} {{ p.nombreMedida }}</div>
+          <div class="product-quantity">
+            <button mat-icon-button (click)="decreaseQuantity(p)" tabindex="-1">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <mat-form-field appearance="outline" class="input-container">
+              <input matInput required type="number" min="0" class="quantity-input" [value]="0"/>
+            </mat-form-field>
+            <button mat-icon-button (click)="increaseQuantity(p)" tabindex="-1">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
         </div>
-        <div class="product-info">
-          <div class="product-code">{{ producto.codigo }}</div>
-          <div class="product-description">{{ producto.descripcion }}</div>
-        </div>
-        <div class="product-price"><b>${{ producto.precioLista | number: '1.0-2' }}</b></div>
-        <div class="product-stock">{{ getCantidadDisponibleDeSurcusalSelecionada(producto) }} {{ producto.nombreMedida }}</div>
-        <div class="product-quantity">
-          <button mat-icon-button (click)="decreaseQuantity(producto)">
-            <mat-icon>remove</mat-icon>
-          </button>
-          <mat-form-field>
-            <input matInput type="text" [value]="0" />
-          </mat-form-field>
-          <button mat-icon-button (click)="increaseQuantity(producto)">
-            <mat-icon>add</mat-icon>
-          </button>
-        </div>
-      </div>
+      </mat-card-content>
     </mat-card>
-  }
+    }
+    }
   </div>

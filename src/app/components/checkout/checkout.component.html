@@ -33,10 +33,9 @@
   <div class="checkout-total">
     <div class="total-labels">
       <span class="total-label"><b>TOTAL</b></span>
-      <span class="total-value"><b>${{ total }}</b></span>
+      <span class="total-value"><b>${{ total | number: '1.0-2' }}</b></span>
     </div>
     <button matButton="filled" class="checkout-btn" (click)="finalize()">
-      <mat-icon>check</mat-icon>
       <span>Finalizar</span>
     </button>
   </div>
