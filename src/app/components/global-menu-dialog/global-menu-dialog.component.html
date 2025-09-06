@@ -1,0 +1,16 @@
+<mat-dialog-content>
+
+  <h3>Sucursales</h3>
+  <form [formGroup]="form">
+    <mat-selection-list #sucursalesList [formControl]="sucursalesControl" name="sucursales" [multiple]="false">
+      @for (sucursal of sucursales; track sucursal) {
+      <mat-list-option [value]="sucursal">{{sucursal}}</mat-list-option>
+      }
+    </mat-selection-list>
+  </form>
+
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button matButton mat-dialog-close>Cancelar</button>
+  <button matButton="filled" mat-dialog-close>Aceptar</button>  
+</mat-dialog-actions>

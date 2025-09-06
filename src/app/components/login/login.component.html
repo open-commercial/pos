@@ -1,0 +1,33 @@
+<div class="app-login">
+  <img class="logo" src="assets/sin_imagen.png" alt="Logo">
+
+  <form [formGroup]="loginForm" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline">
+      <mat-label>Email o Usuario</mat-label>
+      <input matInput formControlName="username" />
+      @if (loginForm.controls.username.hasError('required') && loginForm.controls.username.touched) {
+      <mat-error>
+        Requerido
+      </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Contraseña</mat-label>
+      <input matInput type="password" formControlName="password">
+      @if (loginForm.controls.password.hasError('required') && loginForm.controls.password.touched) {
+      <mat-error>
+        Requerido
+      </mat-error>
+      }
+    </mat-form-field>
+
+    <button matButton="filled" type="submit" [disabled]="loginForm.invalid || loading()">
+      @if (loading()) {
+      <mat-spinner diameter="20" class="spinner"></mat-spinner>
+      } @else {
+      Ingresar
+      }
+    </button>
+  </form>
+</div>

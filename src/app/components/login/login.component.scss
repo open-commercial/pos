@@ -1,0 +1,21 @@
+:host {
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+
+.app-login {
+  width: 100%;
+  max-width: 350px;
+  text-align: center;  
+
+  .logo {
+    width: 15rem;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+}

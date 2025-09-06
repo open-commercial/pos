@@ -1,0 +1,22 @@
+<mat-dialog-content>
+  <h3>Clientes</h3>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Buscar cliente</mat-label>
+    <input matInput placeholder="Ingrese nombre o dato del cliente">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <form [formGroup]="form">
+    <mat-selection-list #clientesList [formControl]="clientesControl" name="clientes" [multiple]="false">
+      @for (cliente of clientes; track cliente) {
+      <mat-list-option [value]="cliente">{{cliente}}</mat-list-option>
+      }
+    </mat-selection-list>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button matButton mat-dialog-close>Cancelar</button>
+  <button matButton="filled" mat-dialog-close>Aceptar</button>  
+</mat-dialog-actions>
