@@ -23,42 +23,6 @@
       }
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
-
-    <!--div class="menu-items">
-      @if (usuario && sucursales.length) {
-      <div ngbDropdown>
-        <button class="nav-link text-truncate" ngbDropdownToggle data-bs-toggle="dropdown">
-          <fa-icon [icon]="icons.store"></fa-icon>
-        </button>
-        <ul ngbDropdownMenu>
-          <h6 class="dropdown-header">Sucursales</h6>
-          @for (s of sucursales; track s) {
-          <li>
-            <a class="dropdown-item pointer-cursor" (click)="selectSucursal(s)"
-              [ngClass]="{ 'active' : selectedSucursal?.idSucursal === s.idSucursal }">
-              <fa-icon [icon]="icons.store"></fa-icon>
-              {{ s.nombre }}
-            </a>
-          </li>
-          }
-        </ul>
-      </div>
-      <div ngbDropdown>
-        <button class="nav-link text-truncate" ngbDropdownToggle data-bs-toggle="dropdown">
-          <fa-icon [icon]="icons.user"></fa-icon>
-        </button>
-        <ul ngbDropdownMenu>
-          <h6 class="dropdown-header">{{ usuario.nombre }} {{ usuario.apellido }}</h6>
-          <li>
-            <a class="dropdown-item pointer-cursor" (click)="logout()">
-              <fa-icon [icon]="icons.rightFromBracket"></fa-icon>
-              Salir
-            </a>
-          </li>
-        </ul>
-      </div>
-      }
-    </div-->
   </div>
 
   <div class="products-container">

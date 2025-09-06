@@ -72,7 +72,7 @@ export class ProductsComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {
     this.loadingService.activate();
     this.sucursalService.getSucursales()
-      //.pipe(finalize(() => this.loadingService.deactivate()))
+      .pipe(finalize(() => this.loadingService.deactivate()))
       .subscribe({
         next: sucursales => {
           this.sucursales = sucursales;
