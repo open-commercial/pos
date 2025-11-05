@@ -5,9 +5,9 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angul
 import { MatListModule } from '@angular/material/list';
 
 @Component({
-  selector: 'app-global-menu-dialog',
-  templateUrl: './global-menu-dialog.component.html',
-  styleUrls: ['./global-menu-dialog.component.scss'],
+  selector: 'app-search-branch-dialog',
+  templateUrl: './search-branch-dialog.component.html',
+  styleUrls: ['./search-branch-dialog.component.scss'],
   imports: [
     MatDialogContent,
     MatDialogActions,
@@ -18,7 +18,7 @@ import { MatListModule } from '@angular/material/list';
     ReactiveFormsModule
   ],
 })
-export class GlobalMenuDialogComponent {
+export class SearchBranchDialogComponent {
   form: FormGroup;
   sucursales: string[] = ["Sucursal 1", "Sucursal 2", "Sucursal 3"];
   sucursalesControl = new FormControl();

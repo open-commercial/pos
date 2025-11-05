@@ -13,7 +13,9 @@ export class ProductoService {
   baseUrl = environment.apiUrl + '/api/v1/productos';
   criteriaUrl = this.baseUrl + '/busqueda/criteria';
 
-  buscar(criteria: BusquedaProductoCriteria, idSucursal: number, idCliente?: number | null,
+  search(criteria: BusquedaProductoCriteria,
+    idSucursal: number,
+    idCliente?: number | null,
     movimiento?: Movimiento | null): Observable<Pagination> {
     const query = new URLSearchParams();
     if (idCliente) {
