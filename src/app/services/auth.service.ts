@@ -4,11 +4,9 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { StorageKeys, StorageService } from './storage.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { UsuarioService } from './usuario.service';
-import { SucursalService } from './sucursal.service';
 
 export const SERVICE_UNAVAILABLE_MESSAGE = 'Servicio no disponible :(';
 
@@ -17,9 +15,7 @@ export class AuthService {
 
   http = inject(HttpClient);
   storageService = inject(StorageService);
-  router = inject(Router);
   usuarioService = inject(UsuarioService);
-  sucursalService = inject(SucursalService);
   jwtHelper = new JwtHelperService();
   urlLogin = environment.apiUrl + '/api/v1/login';
   urlLogout = environment.apiUrl + '/api/v1/logout';
@@ -50,13 +46,7 @@ export class AuthService {
 
   getLoggedUser(): Observable<Usuario> {
     const authToken = this.getAuthToken();
-    /*if (!authToken) {
-      return null;
-    }*/
     const decodedAuthToken = this.jwtHelper.decodeToken(authToken);
-    /*if (decodedAuthToken.idUsuario === null) {
-      return null;
-    }*/
     return this.usuarioService.getUsuario(decodedAuthToken.idUsuario);
   }
 }

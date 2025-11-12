@@ -1,16 +1,25 @@
-<mat-dialog-content>
-
-  <h3>Sucursales</h3>
-  <form [formGroup]="form">
-    <mat-selection-list #sucursalesList [formControl]="sucursalesControl" name="sucursales" [multiple]="false">
-      @for (sucursal of sucursales; track sucursal) {
-      <mat-list-option [value]="sucursal">{{sucursal}}</mat-list-option>
+<div class="app-search-branch-dialog">
+  @if ($loading()) {
+  <div class="spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+  } @else {
+  <mat-dialog-content>
+    <h3>Sucursales</h3>
+    <mat-selection-list #sucursalesList [multiple]="false">
+      @for (s of $sucursales(); track s) {
+      <mat-list-option [value]="s" [selected]="s.idSucursal === $selectedSucursalId()">
+        {{s.nombre}}
+      </mat-list-option>
       }
     </mat-selection-list>
-  </form>
+  </mat-dialog-content>
 
-</mat-dialog-content>
-<mat-dialog-actions>
-  <button matButton mat-dialog-close>Cancelar</button>
-  <button matButton="filled" mat-dialog-close>Aceptar</button>  
-</mat-dialog-actions>
+  <mat-dialog-actions>
+    <button matButton mat-dialog-close>Cancelar</button>
+    <button matButton="filled" (click)="selectSucursalAsDefault(sucursalesList.selectedOptions.selected[0].value)">
+      Aceptar
+    </button>
+  </mat-dialog-actions>
+  }
+</div>
