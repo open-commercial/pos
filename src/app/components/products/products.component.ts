@@ -1,5 +1,5 @@
 import { BusquedaProductoCriteria } from '../../models/criteria/busqueda-producto-criteria';
-import { Component, effect, HostListener, inject, OnInit, signal } from '@angular/core';
+import { Component, effect, ElementRef, HostListener, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ProductoService } from 'src/app/services/producto.service';
 import { SucursalService } from 'src/app/services/sucursal.service';
 import { Producto } from 'src/app/models/producto';
@@ -56,6 +56,7 @@ export class ProductsComponent implements OnInit {
   $products = signal<Producto[]>([]);
   private debounceTimer: any;
   loggedUser!: Usuario | null;
+  @ViewChild('productSearchInput') productSearchInput!: ElementRef<HTMLInputElement>;
 
   constructor() {
     effect(() => {
@@ -78,7 +79,6 @@ export class ProductsComponent implements OnInit {
       .subscribe({
         next: (s) => {
           this.sucursalService.$selectedSucursal.set(s);
-          this.searchProducts('');
           this.$loading.set(false);
         },
         error: (err) => {
@@ -90,6 +90,7 @@ export class ProductsComponent implements OnInit {
 
   clearSearch() {
     this.infiniteScrollPage = 0;
+    this.productSearchInput.nativeElement.value = '';
     this.$searchCriteria.set('');
   }
 
@@ -128,6 +129,7 @@ export class ProductsComponent implements OnInit {
         next: (data) => {
           this.$products.set(this.$products().concat(data.content));
           this.isLastPage = data.last;
+          setTimeout(() => this.productSearchInput.nativeElement.focus(), 0);
           this.$loading.set(false);
         },
         error: (err) => {
@@ -155,6 +157,8 @@ export class ProductsComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.notificationService.openSnackBar("Sucursal seleccionada: " + result, '', 3500);
+        this.infiniteScrollPage = 0;
+        this.searchProducts(this.$searchCriteria());
       }
     });
   }

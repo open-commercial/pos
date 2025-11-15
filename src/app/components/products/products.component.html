@@ -18,9 +18,11 @@
 
     <mat-form-field appearance="outline" class="form-field">
       <mat-label>Buscar productos</mat-label>
-      <input matInput type="text" [ngModel]="$searchCriteria()" (ngModelChange)="$searchCriteria.set($event)">
+      <input matInput type="text" (input)="$searchCriteria.set($any($event.target).value)" #productSearchInput
+        [disabled]="$loading()" />
       @if ($searchCriteria()) {
-      <button matSuffix matIconButton aria-label="Clear" (click)="clearSearch()" tabindex="-1">
+      <button matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()" tabindex="-1"
+        [disabled]="$loading()">
         <mat-icon>close</mat-icon>
       </button>
       }
