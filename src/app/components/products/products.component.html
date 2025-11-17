@@ -30,7 +30,7 @@
     </mat-form-field>
   </div>
 
-  <div (scroll)="onProductsScroll($event)" class="products-container">
+  <div class="products-container" (scroll)="onProductsScroll($event)">
     @for (p of $products(); track p) {
     <mat-card appearance="outlined">
       <mat-card-content>
@@ -63,6 +63,11 @@
     <div class="spinner">
       <mat-spinner></mat-spinner>
     </div>
+    }
+    @if (!$loading() && $products().length === 0) {
+    <span class="no-results">
+      No existen productos que coincidan con la búsqueda
+    </span>
     }
   </div>
 
