@@ -1,4 +1,4 @@
-import { Usuario } from './../models/usuario';
+import { Usuario } from '../models/usuario.model';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';

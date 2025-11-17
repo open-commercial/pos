@@ -3,7 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import { SucursalService } from 'src/app/services/sucursal.service';
-import { Sucursal } from 'src/app/models/sucursal';
+import { Sucursal } from 'src/app/models/sucursal.model';
 import { AuthService, SERVICE_UNAVAILABLE_MESSAGE } from 'src/app/services/auth.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NotificationService } from 'src/app/services/notification.service';

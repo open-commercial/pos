@@ -1,10 +1,10 @@
 import { Observable } from 'rxjs';
-import { BusquedaProductoCriteria } from '../models/criteria/busqueda-producto-criteria';
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
-import { Pagination } from '../models/pagination';
-import { Movimiento } from '../models/movimiento';
+import { BusquedaProductoCriteria } from '../models/busqueda-producto-criteria.model';
+import { Pagination } from '../models/pagination.model';
+import { Movimiento } from '../models/movimiento.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProductoService {

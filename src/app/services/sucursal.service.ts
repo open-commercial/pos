@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Sucursal } from '../models/sucursal';
+import { Sucursal } from '../models/sucursal.model';
 import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })

@@ -1,9 +1,6 @@
-import { BusquedaProductoCriteria } from '../../models/criteria/busqueda-producto-criteria';
 import { Component, effect, ElementRef, HostListener, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { ProductoService } from 'src/app/services/producto.service';
 import { SucursalService } from 'src/app/services/sucursal.service';
-import { Producto } from 'src/app/models/producto';
-import { CantidadEnSucursal } from "src/app/models/cantidad-en-sucursal";
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { AuthService, SERVICE_UNAVAILABLE_MESSAGE } from 'src/app/services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,7 +17,10 @@ import { SearchBranchDialogComponent } from '../search-branch-dialog/search-bran
 import { NotificationService } from 'src/app/services/notification.service';
 import { Router } from '@angular/router';
 import { switchMap } from 'rxjs';
-import { Usuario } from 'src/app/models/usuario';
+import { Usuario } from 'src/app/models/usuario.model';
+import { Producto } from 'src/app/models/producto.model';
+import { CantidadEnSucursal } from "src/app/models/cantidad-en-sucursal.model";
+import { BusquedaProductoCriteria } from '../../models/busqueda-producto-criteria.model';
 
 @Component({
   selector: 'app-products',
@@ -129,7 +129,9 @@ export class ProductsComponent implements OnInit {
         next: (data) => {
           this.$products.set(this.$products().concat(data.content));
           this.isLastPage = data.last;
-          setTimeout(() => this.productSearchInput.nativeElement.focus(), 0);
+          if (this.infiniteScrollPage === 0) {
+            setTimeout(() => this.productSearchInput.nativeElement.focus(), 0);
+          }
           this.$loading.set(false);
         },
         error: (err) => {

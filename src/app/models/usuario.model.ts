@@ -1,4 +1,4 @@
-import { Rol } from "./rol";
+import { Rol } from "./rol.model";
 
 export interface Usuario {
   idUsuario: number;
