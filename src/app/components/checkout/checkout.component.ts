@@ -57,7 +57,7 @@ export class CheckoutComponent {
     alert('Compra finalizada');
   }
 
-  openDialog() {
+  openSearchCustomerDialog() {
     const dialogRef = this.dialog.open(SearchCustomerDialogComponent, { restoreFocus: false });
     dialogRef.afterClosed().subscribe(
       () => this.notificationService.openSnackBar("Cliente seleccionado", '', 3500));

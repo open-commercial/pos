@@ -1,0 +1,25 @@
+<div class="app-search-branch-dialog">
+  @if ($loading()) {
+  <div class="spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+  } @else {
+  <mat-dialog-content>
+    <h3>Sucursales</h3>
+    <mat-selection-list #sucursalesList [multiple]="false">
+      @for (s of $sucursales(); track s) {
+      <mat-list-option [value]="s" [selected]="s.idSucursal === $selectedSucursalId()">
+        {{s.nombre}}
+      </mat-list-option>
+      }
+    </mat-selection-list>
+  </mat-dialog-content>
+
+  <mat-dialog-actions>
+    <button matButton mat-dialog-close>Cancelar</button>
+    <button matButton="filled" (click)="selectSucursalAsDefault(sucursalesList.selectedOptions.selected[0].value)">
+      Aceptar
+    </button>
+  </mat-dialog-actions>
+  }
+</div>

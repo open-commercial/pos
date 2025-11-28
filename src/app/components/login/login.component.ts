@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService, SERVICE_UNAVAILABLE_MESSAGE } from 'src/app/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -26,10 +26,9 @@ export class LoginComponent {
 
   authService = inject(AuthService);
   formBuilder = inject(FormBuilder);
-  loading = signal(false);
   router = inject(Router);
   notificationService = inject(NotificationService);
-  errorMessage = "Servicio no disponible :(";
+  loading = signal(false);
 
   loginForm = this.formBuilder.group({
     username: ['', Validators.required],
@@ -53,7 +52,7 @@ export class LoginComponent {
         this.loginForm.get('username')?.enable();
         this.loginForm.get('password')?.enable();
         if (err.status === 0) {
-          this.notificationService.openSnackBar(this.errorMessage, '', 3500);
+          this.notificationService.openSnackBar(SERVICE_UNAVAILABLE_MESSAGE, '', 3500);
         } else {
           this.notificationService.openSnackBar(err.error, '', 3500);
         }

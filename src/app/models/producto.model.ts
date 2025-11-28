@@ -1,4 +1,4 @@
-import { CantidadEnSucursal } from "./cantidad-en-sucursal";
+import { CantidadEnSucursal } from "./cantidad-en-sucursal.model";
 
 export interface Producto {
   idProducto: number;

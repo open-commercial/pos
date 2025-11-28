@@ -1,4 +1,4 @@
-import { Rol } from "./rol";
+import { Rol } from "./rol.model";
 
 export interface Usuario {
   idUsuario: number;
@@ -7,7 +7,7 @@ export interface Usuario {
   nombre: string;
   apellido: string;
   email: string;
-  idSucursalPredeterminada?: number;
+  idSucursalPredeterminada: number;
   roles: Array<Rol>;
   habilitado: boolean;
 }
