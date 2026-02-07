@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
-import * as crypto from 'crypto-js';
+import crypto from 'crypto-js';
 
-export enum StorageKeys {
-  TOKEN = 'token'
+export enum LocalStorageKeys {
+  TOKEN = 'token',
+  PEDIDO = 'pedido'
 }
 
 @Injectable({providedIn: 'root'})
-export class StorageService {
+export class LocalStorageUtil {
 
   getItem(key: string) {
     return this.decrypt(localStorage.getItem(key));
@@ -29,14 +30,14 @@ export class StorageService {
   }
 
   private encrypt(data: any): string {
-    return crypto.AES.encrypt(JSON.stringify(data), StorageService.getSK()).toString();
+    return crypto.AES.encrypt(JSON.stringify(data), LocalStorageUtil.getSK()).toString();
   }
 
   private decrypt(data: string|null) {
     if (data === null || data === undefined) {
       return null;
     }
-    const bytes = crypto.AES.decrypt(data, StorageService.getSK());
+    const bytes = crypto.AES.decrypt(data, LocalStorageUtil.getSK());
     return JSON.parse(bytes.toString(crypto.enc.Utf8));
   }
 }

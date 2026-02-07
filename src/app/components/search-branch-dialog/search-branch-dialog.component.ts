@@ -2,12 +2,12 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
-import { SucursalService } from 'src/app/services/sucursal.service';
+import { BranchService } from 'src/app/services/branch.service';
 import { Sucursal } from 'src/app/models/sucursal.model';
 import { AuthService, SERVICE_UNAVAILABLE_MESSAGE } from 'src/app/services/auth.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NotificationService } from 'src/app/services/notification.service';
-import { UsuarioService } from 'src/app/services/usuario.service';
+import { UserService } from 'src/app/services/user.service';
 import { switchMap } from 'rxjs';
 
 @Component({
@@ -25,9 +25,9 @@ import { switchMap } from 'rxjs';
 })
 export class SearchBranchDialogComponent implements OnInit {
 
-  sucursalService = inject(SucursalService);
+  branchService = inject(BranchService);
   authService = inject(AuthService);
-  usuarioService = inject(UsuarioService);
+  userService = inject(UserService);
   notificationService = inject(NotificationService);
   $sucursales = signal<Sucursal[]>([]);
   $selectedSucursalId = signal<number>(0);
@@ -40,7 +40,7 @@ export class SearchBranchDialogComponent implements OnInit {
       .pipe(
         switchMap(u => {
           this.$selectedSucursalId.set(u.idSucursalPredeterminada);
-          return this.sucursalService.getSucursales()
+          return this.branchService.getBranches()
         }))
       .subscribe({
         next: (sucursales) => {
@@ -59,11 +59,11 @@ export class SearchBranchDialogComponent implements OnInit {
     this.$loading.set(true);
     this.authService.getLoggedUser()
       .pipe(
-        switchMap(u => this.usuarioService.setSucursalDefault(u.idUsuario, selectedSucursal.idSucursal)
+        switchMap(u => this.userService.setDefaultBranch(u.idUsuario, selectedSucursal.idSucursal)
         ))
       .subscribe({
         next: () => {
-          this.sucursalService.$selectedSucursal.set(selectedSucursal);
+          this.branchService.$selectedSucursal.set(selectedSucursal);
           this.$loading.set(false);
           this.dialogRef.close(selectedSucursal.nombre);
         },

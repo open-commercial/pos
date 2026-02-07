@@ -5,16 +5,16 @@ import { environment } from 'src/environments/environment';
 import { Usuario } from '../models/usuario.model';
 
 @Injectable({providedIn: 'root'})
-export class UsuarioService {
+export class UserService {
 
   http = inject(HttpClient);
   baseUrl = environment.apiUrl + '/api/v1/usuarios';
 
-  getUsuario(idUsuario: number): Observable<Usuario> {
+  getUser(idUsuario: number): Observable<Usuario> {
     return this.http.get<Usuario>(`${this.baseUrl}/${idUsuario}`);
   }
   
-  setSucursalDefault(idUsuario: number, idSucursal: number): Observable<void> {
+  setDefaultBranch(idUsuario: number, idSucursal: number): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/${idUsuario}/sucursales/${idSucursal}`, {});
   }
 }

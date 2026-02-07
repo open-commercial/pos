@@ -2,11 +2,11 @@ import { Usuario } from '../models/usuario.model';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { StorageKeys, StorageService } from './storage.service';
+import { LocalStorageKeys, LocalStorageUtil } from '../utils/local-storage-util';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { UsuarioService } from './usuario.service';
+import { UserService } from './user.service';
 
 export const SERVICE_UNAVAILABLE_MESSAGE = 'Servicio no disponible :(';
 
@@ -14,8 +14,8 @@ export const SERVICE_UNAVAILABLE_MESSAGE = 'Servicio no disponible :(';
 export class AuthService {
 
   http = inject(HttpClient);
-  storageService = inject(StorageService);
-  usuarioService = inject(UsuarioService);
+  storageService = inject(LocalStorageUtil);
+  usuarioService = inject(UserService);
   jwtHelper = new JwtHelperService();
   urlLogin = environment.apiUrl + '/api/v1/login';
   urlLogout = environment.apiUrl + '/api/v1/logout';
@@ -24,19 +24,19 @@ export class AuthService {
     const credential = { username: username, password: password };
     return this.http.post(this.urlLogin, credential, { responseType: 'text' })
       .pipe(tap((token) => {
-        this.storageService.setItem(StorageKeys.TOKEN, token);
+        this.storageService.setItem(LocalStorageKeys.TOKEN, token);
       }));
   }
 
   logout() {
     return this.http.put(this.urlLogout, {})
       .pipe(tap(() => {
-        this.storageService.removeItem(StorageKeys.TOKEN);
+        this.storageService.removeItem(LocalStorageKeys.TOKEN);
       }));
   }
 
   getAuthToken(): string {
-    return this.storageService.getItem(StorageKeys.TOKEN);
+    return this.storageService.getItem(LocalStorageKeys.TOKEN);
   }
 
   isAuthenticated(): boolean {
@@ -47,6 +47,6 @@ export class AuthService {
   getLoggedUser(): Observable<Usuario> {
     const authToken = this.getAuthToken();
     const decodedAuthToken = this.jwtHelper.decodeToken(authToken);
-    return this.usuarioService.getUsuario(decodedAuthToken.idUsuario);
+    return this.usuarioService.getUser(decodedAuthToken.idUsuario);
   }
 }

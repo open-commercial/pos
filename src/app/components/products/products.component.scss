@@ -17,6 +17,7 @@
     .form-field {
       flex-grow: 1;
       margin: 0 1.5rem;
+      background-color: white;
     }
   }
 
@@ -27,6 +28,10 @@
     flex-direction: column;
     gap: 0.5rem;
     padding: 1rem;
+
+    .product-card {
+      background-color: white;
+    }
 
     .spinner {
       display: flex;
@@ -91,10 +96,22 @@
 
           .quantity-input {
             text-align: center;
-          }
+          }          
         }
       }
     }
   }
 
+  /* Chrome, Edge, Safari */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
 }

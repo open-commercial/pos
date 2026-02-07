@@ -1,11 +1,8 @@
-import { TipoDeComprobante } from './tipo-de-comprobante.model';
-
-export interface NuevosResultadosComprobante {
+export interface NuevosResultadosPedido {
   importe: Array<number>;
   ivaPorcentajes: Array<number>;
   ivaNetos: Array<number>;
   cantidades: Array<number>;
-  tipoDeComprobante: TipoDeComprobante;
   descuentoPorcentaje: number;
   recargoPorcentaje: number;
 }

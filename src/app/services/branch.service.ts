@@ -5,17 +5,17 @@ import { Sucursal } from '../models/sucursal.model';
 import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
-export class SucursalService {
+export class BranchService {
 
   http = inject(HttpClient);
   baseUrl = environment.apiUrl + '/api/v1/sucursales';
   $selectedSucursal = signal<Sucursal | null>(null);
 
-  getSucursales(): Observable<Array<Sucursal>> {
+  getBranches(): Observable<Array<Sucursal>> {
     return this.http.get<Array<Sucursal>>(this.baseUrl);
   }
 
-  getSucursalById(idSucursal: number): Observable<Sucursal> {
+  getBranchById(idSucursal: number): Observable<Sucursal> {
     return this.http.get<Sucursal>(`${this.baseUrl}/${idSucursal}`);
   }
 

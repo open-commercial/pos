@@ -4,10 +4,9 @@ import { inject, Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
 import { BusquedaProductoCriteria } from '../models/busqueda-producto-criteria.model';
 import { Pagination } from '../models/pagination.model';
-import { Movimiento } from '../models/movimiento.model';
 
 @Injectable({ providedIn: 'root' })
-export class ProductoService {
+export class ProductService {
 
   http = inject(HttpClient);
   baseUrl = environment.apiUrl + '/api/v1/productos';
@@ -15,14 +14,10 @@ export class ProductoService {
 
   search(criteria: BusquedaProductoCriteria,
     idSucursal: number,
-    idCliente?: number | null,
-    movimiento?: Movimiento | null): Observable<Pagination> {
+    idCliente?: number | null): Observable<Pagination> {
     const query = new URLSearchParams();
     if (idCliente) {
       query.append('idCliente', idCliente.toString());
-    }
-    if (movimiento) {
-      query.append('movimiento', movimiento);
     }
     const qs = query.toString();
     const url = `${this.criteriaUrl}/sucursales/${idSucursal}${(qs ? '?' + qs : '')}`;
