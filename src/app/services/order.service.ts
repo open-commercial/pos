@@ -36,8 +36,7 @@ export class OrderService {
     return this.http.post<Resultados>(`${this.baseUrl}/calculo-pedido`, nrp);
   }
 
-  addOrderLine(p: Producto) {
-    
+  addOrderLine(p: Producto) {    
     this._newOrder.set({});
   }
 

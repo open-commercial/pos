@@ -19,7 +19,7 @@
             <span class="checkout-qty">{{ item.qty }}x</span>
             <span class="checkout-desc">{{ item.desc }}</span>
             <span class="spacer"></span>
-            <span class="checkout-price">${{ item.price }}</span>
+            <span class="checkout-price">${{ item.price | number: '1.0-2' }}</span>
             <button matIconButton (click)="removeItem(item)">
               <mat-icon>close</mat-icon>
             </button>
