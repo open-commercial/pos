@@ -4,8 +4,8 @@
     <mat-spinner></mat-spinner>
   </div>
   } @else {
+  <h2 mat-dialog-title>Sucursales</h2>
   <mat-dialog-content>
-    <h3>Sucursales</h3>
     <mat-selection-list #sucursalesList [multiple]="false">
       @for (s of $sucursales(); track s) {
       <mat-list-option [value]="s" [selected]="s.idSucursal === $selectedSucursalId()">

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import { BranchService } from 'src/app/services/branch.service';
 import { Sucursal } from 'src/app/models/sucursal.model';
@@ -20,7 +20,8 @@ import { switchMap } from 'rxjs';
     MatDialogClose,
     MatButtonModule,
     MatListModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatDialogModule
   ],
 })
 export class SearchBranchDialogComponent implements OnInit {
