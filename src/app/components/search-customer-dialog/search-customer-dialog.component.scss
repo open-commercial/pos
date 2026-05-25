@@ -1,0 +1,23 @@
+.app-search-customer-dialog {
+
+  .search-field {
+    width: 100%;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .full-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2rem 2rem;
+  }
+
+  .spinner-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+}

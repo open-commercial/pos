@@ -1,22 +1,33 @@
-<mat-dialog-content>
-  <h3>Clientes</h3>
-
-  <mat-form-field appearance="outline">
-    <mat-label>Buscar cliente</mat-label>
-    <input matInput placeholder="Ingrese nombre o dato del cliente">
-    <mat-icon matSuffix>search</mat-icon>
-  </mat-form-field>
-
-  <form [formGroup]="form">
-    <mat-selection-list #clientesList [formControl]="clientesControl" name="clientes" [multiple]="false">
-      @for (cliente of clientes; track cliente) {
-      <mat-list-option [value]="cliente">{{cliente}}</mat-list-option>
+<div class="app-search-customer-dialog">
+  <h2 mat-dialog-title>Clientes</h2>
+  <mat-dialog-content class="mat-typography" (scroll)="onCustomersScroll($event)">
+    @if ($loading() && infiniteScrollPage === 0) {
+    <div class="full-spinner">
+      <mat-spinner></mat-spinner>
+    </div>
+    } @else {
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar cliente</mat-label>
+      <input matInput type="text" (input)="$searchCriteria.set($any($event.target).value)" #customerSearchInput
+        [disabled]="$loading()" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+    <mat-selection-list #clientesList name="clientes" [multiple]="false">
+      @for (c of $customers(); track c) {
+      <mat-list-option [value]="c" [selected]="c.cliente.idCliente === $selectedCustomerId()">
+        {{c.cliente.nombreFiscal}} @if (c.cliente.nombreFantasia) {({{c.cliente.nombreFantasia}})}
+      </mat-list-option>
       }
     </mat-selection-list>
-  </form>
-</mat-dialog-content>
-
-<mat-dialog-actions>
-  <button matButton mat-dialog-close>Cancelar</button>
-  <button matButton="filled" mat-dialog-close>Aceptar</button>  
-</mat-dialog-actions>
+    @if ($loading() && infiniteScrollPage > 0) {
+    <div class="spinner-bottom">
+      <mat-spinner diameter="30"></mat-spinner>
+    </div>
+    }
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button matButton mat-dialog-close>Cancelar</button>
+    <button matButton="filled" mat-dialog-close>Aceptar</button>
+  </mat-dialog-actions>
+</div>
