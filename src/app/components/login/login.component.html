@@ -4,7 +4,7 @@
   <form [formGroup]="loginForm" (ngSubmit)="submit()">
     <mat-form-field appearance="outline">
       <mat-label>Email o Usuario</mat-label>
-      <input matInput formControlName="username" autofocus/>
+      <input matInput formControlName="username" #usernameInput autofocus />
       @if (loginForm.controls.username.hasError('required') && loginForm.controls.username.touched) {
       <mat-error>
         Requerido

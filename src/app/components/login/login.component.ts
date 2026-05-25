@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService, SERVICE_UNAVAILABLE_MESSAGE } from 'src/app/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -24,6 +24,7 @@ import { NotificationService } from 'src/app/services/notification.service';
 })
 export class LoginComponent {
 
+  @ViewChild('usernameInput') usernameInput?: ElementRef<HTMLInputElement>;
   authService = inject(AuthService);
   formBuilder = inject(FormBuilder);
   router = inject(Router);
@@ -56,6 +57,7 @@ export class LoginComponent {
         } else {
           this.notificationService.openSnackBar(err.error, '', 3500);
         }
+        this.usernameInput?.nativeElement.focus();
       }
     });
   }
