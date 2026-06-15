@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { ProductService } from 'src/app/services/product.service';
 import { BranchService } from 'src/app/services/branch.service';
 import { CommonModule, DecimalPipe } from '@angular/common';
@@ -41,7 +41,7 @@ import { OrderService } from "../../services/order.service";
     MatProgressSpinnerModule
   ]
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent {
 
   notificationService = inject(NotificationService);
   authService = inject(AuthService);
@@ -67,9 +67,11 @@ export class ProductsComponent implements OnInit {
       clearTimeout(this.debounceTimer);
       this.debounceTimer = setTimeout(() => this.searchProducts(term), this.debounceTimeMs);
     });
+
+    this.loadSelectedBranch();
   }
 
-  ngOnInit(): void {
+  loadSelectedBranch() {
     this.$loading.set(true);
     this.authService.getLoggedUser()
       .pipe(
@@ -174,7 +176,7 @@ export class ProductsComponent implements OnInit {
       if (quantity > availableQuantity) {
         input.value = availableQuantity.toString();
       }
-    }    
+    }
 
     this.notificationService.openSnackBar(`Cantidad para el producto ${product.descripcion} cambiada.`, '', 1000);
   }
@@ -238,7 +240,7 @@ export class ProductsComponent implements OnInit {
   }
 
   openSearchBranchDialog() {
-    const dialogRef = this.dialog.open(SearchBranchDialogComponent, { restoreFocus: false, disableClose: true });
+    const dialogRef = this.dialog.open(SearchBranchDialogComponent, { restoreFocus: false });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.notificationService.openSnackBar("Sucursal seleccionada: " + result, '', 3500);

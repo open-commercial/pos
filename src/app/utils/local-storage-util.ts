@@ -3,10 +3,11 @@ import crypto from 'crypto-js';
 
 export enum LocalStorageKeys {
   TOKEN = 'token',
-  PEDIDO = 'pedido'
+  ORDER = 'order',
+  CUSTOMER_ACCOUNT = 'customer_account'
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class LocalStorageUtil {
 
   getItem(key: string) {
@@ -33,7 +34,7 @@ export class LocalStorageUtil {
     return crypto.AES.encrypt(JSON.stringify(data), LocalStorageUtil.getSK()).toString();
   }
 
-  private decrypt(data: string|null) {
+  private decrypt(data: string | null) {
     if (data === null || data === undefined) {
       return null;
     }

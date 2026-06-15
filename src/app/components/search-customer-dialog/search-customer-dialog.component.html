@@ -1,33 +1,45 @@
-<div class="app-search-customer-dialog">
-  <h2 mat-dialog-title>Clientes</h2>
-  <mat-dialog-content class="mat-typography" (scroll)="onCustomersScroll($event)">
-    @if ($loading() && infiniteScrollPage === 0) {
-    <div class="full-spinner">
-      <mat-spinner></mat-spinner>
+<h2 mat-dialog-title>Clientes</h2>
+
+@if (!$error()) {
+<mat-dialog-content>
+  <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+    <mat-label>Buscar cliente</mat-label>
+    <input matInput type="text" (input)="$searchCriteria.set($any($event.target).value)" #customerSearchInput
+      [disabled]="$loading()" />
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+</mat-dialog-content>
+}
+
+<mat-dialog-content class="mat-typography" (scroll)="onCustomersScroll($event)">
+  <mat-selection-list #customersList [multiple]="false">
+    @for (c of $customers(); track c) {
+    <mat-list-option [value]="c" [selected]="c.cliente.idCliente === $selectedCustomerId()">
+      {{c.cliente.nombreFiscal}} @if (c.cliente.nombreFantasia) {({{c.cliente.nombreFantasia}})}
+    </mat-list-option>
+    }
+    @if ($loading()) {
+    <div class="spinner">
+      <mat-spinner diameter="50"></mat-spinner>
     </div>
-    } @else {
-    <mat-form-field appearance="outline" class="search-field">
-      <mat-label>Buscar cliente</mat-label>
-      <input matInput type="text" (input)="$searchCriteria.set($any($event.target).value)" #customerSearchInput
-        [disabled]="$loading()" />
-      <mat-icon matSuffix>search</mat-icon>
-    </mat-form-field>
-    <mat-selection-list #clientesList name="clientes" [multiple]="false">
-      @for (c of $customers(); track c) {
-      <mat-list-option [value]="c" [selected]="c.cliente.idCliente === $selectedCustomerId()">
-        {{c.cliente.nombreFiscal}} @if (c.cliente.nombreFantasia) {({{c.cliente.nombreFantasia}})}
-      </mat-list-option>
-      }
-    </mat-selection-list>
-    @if ($loading() && infiniteScrollPage > 0) {
-    <div class="spinner-bottom">
-      <mat-spinner diameter="30"></mat-spinner>
+    } @else if ($error()) {
+    <div class="error-state">
+      <span class="error-message">No se pudo cargar la lista de clientes</span>
+      <button class="retry-button" matButton="outlined" (click)="searchCustomers($searchCriteria())">
+        <mat-icon>refresh</mat-icon>
+        Reintentar
+      </button>
     </div>
     }
-    }
-  </mat-dialog-content>
-  <mat-dialog-actions>
-    <button matButton mat-dialog-close>Cancelar</button>
-    <button matButton="filled" mat-dialog-close>Aceptar</button>
-  </mat-dialog-actions>
-</div>
+  </mat-selection-list>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  @if (!$error()) {
+  <button matButton mat-dialog-close tabindex="-1" [disabled]="$loading()">Cancelar</button>
+  <button matButton="filled" (click)="selectCustomerAccount(customersList.selectedOptions.selected[0].value)"
+    [disabled]="$loading()">
+    Aceptar
+  </button>
+  }
+</mat-dialog-actions>

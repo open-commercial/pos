@@ -1,4 +1,4 @@
-<div class="app-login">
+<div class="login-container">
   <img class="logo" src="assets/sin_imagen.png" alt="Logo">
 
   <form [formGroup]="loginForm" (ngSubmit)="submit()">
@@ -22,8 +22,8 @@
       }
     </mat-form-field>
 
-    <button matButton="filled" type="submit" [disabled]="loginForm.invalid || loading()">
-      @if (loading()) {
+    <button matButton="filled" type="submit" [disabled]="loginForm.invalid || $loading()">
+      @if ($loading()) {
       <mat-spinner diameter="20" class="spinner"></mat-spinner>
       } @else {
       Ingresar

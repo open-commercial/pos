@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -7,7 +7,10 @@ import { NotificationService } from 'src/app/services/notification.service';
 import { SearchCustomerDialogComponent } from '../search-customer-dialog/search-customer-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { DecimalPipe } from '@angular/common';
-import { OrderService } from "../../services/order.service";
+import { OrderService } from '../../services/order.service';
+import { CustomerAccountService } from '../../services/customer-account.service';
+import { LocalStorageKeys, LocalStorageUtil } from '../../utils/local-storage-util';
+import { CuentaCorrienteCliente } from '../../models/cuenta-corriente-cliente.model';
 
 interface CheckoutItem {
   qty: number;
@@ -31,7 +34,12 @@ export class CheckoutComponent {
 
   notificationService = inject(NotificationService);
   orderService = inject(OrderService);
+  customerAccountService = inject(CustomerAccountService);
+  storageService = inject(LocalStorageUtil);
   readonly dialog = inject(MatDialog);
+  $customerName = signal('');
+  $customerError = signal(false);
+  
   items: CheckoutItem[] = [
     {qty: 3, desc: 'Abrelatas Uña Pata 506 Loekemeyer', price: 4500.50},
     {qty: 3, desc: 'ACCURATO Carnicero+Oficio ceramica TRAMONTINA 24199/090 para cocinero', price: 4500},
@@ -55,6 +63,29 @@ export class CheckoutComponent {
     effect(() => {
       console.log(this.orderService.$newOrder());
     });
+
+    this.loadDefaultCustomer();
+  }
+
+  loadDefaultCustomer() {
+    const storedCustomerAccount = this.storageService.getItem(LocalStorageKeys.CUSTOMER_ACCOUNT) as CuentaCorrienteCliente | null;
+
+    if (storedCustomerAccount?.cliente?.nombreFiscal) {
+      this.$customerError.set(false);
+      this.$customerName.set(storedCustomerAccount.cliente.nombreFiscal);
+      return;
+    }
+
+    this.customerAccountService.getDefaultCustomerAccount().subscribe({
+      next: (customerAccount) => {
+        this.storageService.setItem(LocalStorageKeys.CUSTOMER_ACCOUNT, customerAccount);
+        this.$customerError.set(false);
+        this.$customerName.set(customerAccount.cliente?.nombreFiscal ?? '');
+      },
+      error: () => {
+        this.$customerError.set(true);
+      }
+    });
   }
 
   total(): number {
@@ -63,12 +94,12 @@ export class CheckoutComponent {
 
   addItem() {
     this.items.push({qty: 1, desc: 'Nuevo producto', price: 1000});
-    this.notificationService.openSnackBar('Se agregó "Nuevo producto" a la lista', '', 3000);
+    this.notificationService.openSnackBar('✅ Se agregó "Nuevo producto" a la lista', '', 3000);
   }
 
   removeItem(item: CheckoutItem) {
     this.items = this.items.filter(i => i !== item);
-    this.notificationService.openSnackBar("Se quitó \"" + item.desc + "\" de la lista", '', 3000);
+    this.notificationService.openSnackBar("❌ Se quitó \"" + item.desc + "\" de la lista", '', 3000);
   }
 
   finalize() {
@@ -76,9 +107,13 @@ export class CheckoutComponent {
   }
 
   openSearchCustomerDialog() {
-    const dialogRef = this.dialog.open(SearchCustomerDialogComponent, {restoreFocus: false});
-    dialogRef.afterClosed().subscribe(
-      () => this.notificationService.openSnackBar("Cliente seleccionado", '', 3500));
+    const dialogRef = this.dialog.open(SearchCustomerDialogComponent, { restoreFocus: false });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.$customerName.set(result);
+        this.notificationService.openSnackBar("✅ Cliente seleccionado: " + result, '', 5000);
+      }
+    });
   }
 
   /*

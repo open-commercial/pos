@@ -22,7 +22,7 @@ export class OrderService {
   $newOrder = this._newOrder.asReadonly();
 
   constructor() {
-    const storedOrder = this.localStorageUtil.getItem(LocalStorageKeys.PEDIDO);
+    const storedOrder = this.localStorageUtil.getItem(LocalStorageKeys.ORDER);
     if (storedOrder) {
       this._newOrder.set(storedOrder);
     }
@@ -46,7 +46,7 @@ export class OrderService {
 
   saveOrder(np: NuevoPedido): Observable<Pedido> {
     return this.http.post<Pedido>(this.baseUrl, np).pipe(
-      tap(() => this.localStorageUtil.removeItem(LocalStorageKeys.PEDIDO))
+      tap(() => this.localStorageUtil.removeItem(LocalStorageKeys.ORDER))
     );
   }
 }

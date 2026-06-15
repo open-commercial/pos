@@ -32,6 +32,7 @@ export class AuthService {
     return this.http.put(this.urlLogout, {})
       .pipe(tap(() => {
         this.storageService.removeItem(LocalStorageKeys.TOKEN);
+        this.storageService.removeItem(LocalStorageKeys.CUSTOMER_ACCOUNT);
       }));
   }
 

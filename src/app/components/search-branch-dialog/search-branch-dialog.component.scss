@@ -1,11 +1,32 @@
-.app-search-branch-dialog {
+.spinner {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  margin: 2rem 2rem;
+}
 
-  .spinner {
-    display: flex;
-    flex: 1 1 0;
-    align-items: center;
-    justify-content: center;
-    margin: 2rem 2rem;
-  }
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: rgba(244, 67, 54, 0.08);
+  color: #b71c1c;
+}
 
+.error-message {
+  font-weight: 500;
+}
+
+.retry-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  color: #b71c1c;
 }

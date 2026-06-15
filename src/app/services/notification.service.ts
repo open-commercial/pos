@@ -6,9 +6,10 @@ export class NotificationService {
 
   snackBar = inject(MatSnackBar);
 
-  openSnackBar(message: string, action: string = '', duration: number = 3500) {
+  openSnackBar(message: string, action: string, duration: number) {
     const config = new MatSnackBarConfig();
-    config.duration = duration;
-    return this.snackBar.open(message, action, config);
+    config.duration = duration;    
+    const snackBarRef = this.snackBar.open(message, action, config);
+    return snackBarRef;
   }
 }

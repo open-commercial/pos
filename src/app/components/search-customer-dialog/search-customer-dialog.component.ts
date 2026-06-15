@@ -1,17 +1,18 @@
 import { Component, effect, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatListModule } from '@angular/material/list';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { AccountService } from 'src/app/services/accounts.service';
+import { CustomerAccountService } from 'src/app/services/customer-account.service';
 import { BusquedaCuentaCorrienteClienteCriteria } from 'src/app/models/busqueda-cuenta-corriente-cliente-criteria.model';
 import { NotificationService } from 'src/app/services/notification.service';
 import { SERVICE_UNAVAILABLE_MESSAGE } from 'src/app/services/auth.service';
 import { CuentaCorrienteCliente } from 'src/app/models/cuenta-corriente-cliente.model';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LocalStorageKeys, LocalStorageUtil } from 'src/app/utils/local-storage-util';
 
 @Component({
   selector: 'app-search-customer-dialog',
@@ -35,7 +36,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 export class SearchCustomerDialogComponent {
 
   notificationService = inject(NotificationService);
-  accountService = inject(AccountService);
+  customerAccountService = inject(CustomerAccountService);
+  $error = signal(false);
+  storageService = inject(LocalStorageUtil);
   $loading = signal(false);
   $searchCriteria = signal('');
   $customers = signal<CuentaCorrienteCliente[]>([]);
@@ -45,8 +48,11 @@ export class SearchCustomerDialogComponent {
   readonly debounceTimeMs = 500;
   private debounceTimer: any;
   @ViewChild('customerSearchInput') customerSearchInput!: ElementRef<HTMLInputElement>;
+  dialogRef = inject(MatDialogRef<SearchCustomerDialogComponent>);
 
   constructor() {
+    this.$loading.set(true);
+    this.loadSelectedCustomerId();
     effect(() => {
       const term = this.$searchCriteria().trim();
       this.infiniteScrollPage = 0;
@@ -55,8 +61,37 @@ export class SearchCustomerDialogComponent {
     });
   }
 
+  /*
+    constructor() {
+      this.$loading.set(true);
+      this.authService.getLoggedUser()
+        .pipe(
+          switchMap(u => {
+            this.$selectedSucursalId.set(u.idSucursalPredeterminada);
+            return this.branchService.getBranches()
+          }))
+        .subscribe({
+          next: (sucursales) => {
+            this.$sucursales.set(sucursales);
+            this.$loading.set(false);
+          },
+          error: (err) => {
+            this.$loading.set(false);
+            this.showErrorMessage(err);
+            this.dialogRef.close();
+          }
+        });
+    }
+  */
+
+  private loadSelectedCustomerId() {
+    const customerAccount = this.storageService.getItem(LocalStorageKeys.CUSTOMER_ACCOUNT) as CuentaCorrienteCliente | null;
+    this.$selectedCustomerId.set(customerAccount?.cliente?.idCliente ?? null);
+  }
+
   searchCustomers(term: string) {
     this.$loading.set(true);
+    this.$error.set(false);
     const criteria: BusquedaCuentaCorrienteClienteCriteria = {
       nombreFiscal: term,
       nombreFantasia: term,
@@ -67,7 +102,7 @@ export class SearchCustomerDialogComponent {
     if (this.infiniteScrollPage === 0) {
       this.$customers.set([]);
     }
-    this.accountService.search(criteria)
+    this.customerAccountService.search(criteria)
       .subscribe({
         next: (data) => {
           this.$customers.set(this.$customers().concat(data.content));
@@ -77,12 +112,12 @@ export class SearchCustomerDialogComponent {
           }
           this.$loading.set(false);
         },
-        error: (err) => {
+        error: () => {
           if (this.infiniteScrollPage > 0) {
             this.infiniteScrollPage -= 1;
           }
           this.$loading.set(false);
-          this.showErrorMessage(err);
+          this.$error.set(true);
         }
       });
   }
@@ -90,18 +125,19 @@ export class SearchCustomerDialogComponent {
   onCustomersScroll(event: Event) {
     if (this.$loading() || this.isLastPage) return;
     const element = event.target as HTMLElement;
-    const scrollableHeight = element.scrollHeight - window.innerHeight;
-    if (element.scrollTop >= scrollableHeight) {
-      this.infiniteScrollPage += 1;
-      this.searchCustomers(this.$searchCriteria());
+    const scrollableHeight = element.scrollHeight - element.clientHeight;
+    if (scrollableHeight <= 0) return;
+    if (element.scrollTop >= scrollableHeight - 20) {
+      if (!this.isLastPage) {
+        this.infiniteScrollPage += 1;
+        this.searchCustomers(this.$searchCriteria());
+      }
     }
   }
 
-  showErrorMessage(err: any) {
-    if (err.status === 0) {
-      this.notificationService.openSnackBar(SERVICE_UNAVAILABLE_MESSAGE, '', 3500);
-    } else {
-      this.notificationService.openSnackBar(err.error, '', 3500);
-    }
+  selectCustomerAccount(selectedCustomer: CuentaCorrienteCliente) {
+    this.storageService.setItem(LocalStorageKeys.CUSTOMER_ACCOUNT, selectedCustomer);
+    this.dialogRef.close(selectedCustomer.cliente.nombreFiscal);
   }
+
 }

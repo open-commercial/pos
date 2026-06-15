@@ -1,6 +1,16 @@
-<div class="app-checkout">
+<div class="checkout-container">
   <mat-toolbar class="checkout-header">
-    <span class="customer-name"><b>Consumidor Final</b></span>
+    @if ($customerError()) {
+      <div class="customer-error-state">
+        <span class="customer-error-message">No se pudo cargar el cliente predeterminado.</span>
+        <button mat-stroked-button class="customer-retry-button" (click)="loadDefaultCustomer()">
+          <mat-icon>refresh</mat-icon>
+          Reintentar
+        </button>
+      </div>
+    } @else {
+      <span class="customer-name"><b>{{ $customerName() }}</b></span>
+    }
     <span class="spacer"></span>
     <button matIconButton (click)="openSearchCustomerDialog()">
       <mat-icon>person_search</mat-icon>

@@ -1,4 +1,4 @@
-<div class="app-products">
+<div class="products-container">
   <div class="search-container">
     <img class="logo" src="assets/logo.png" alt="Logo" [matMenuTriggerFor]="menu" #menuTrigger>
     <mat-menu #menu="matMenu">
@@ -32,7 +32,7 @@
     </mat-form-field>
   </div>
 
-  <div class="products-container" (scroll)="onProductsScroll($event)">
+  <div class="products-list-container" (scroll)="onProductsScroll($event)">
     @for (p of $products(); track p) {
       <mat-card appearance="outlined" class="product-card">
         <mat-card-content>
@@ -67,7 +67,7 @@
     }
     @if ($loading()) {
       <div class="spinner">
-        <mat-spinner></mat-spinner>
+        <mat-spinner diameter="50"></mat-spinner>
       </div>
     }
     @if (!$loading() && $products().length === 0) {
