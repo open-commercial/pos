@@ -29,7 +29,7 @@ export class LoginComponent {
   formBuilder = inject(FormBuilder);
   router = inject(Router);
   notificationService = inject(NotificationService);
-  loading = signal(false);
+  $loading = signal(false);
 
   loginForm = this.formBuilder.group({
     username: ['', Validators.required],
@@ -40,16 +40,16 @@ export class LoginComponent {
     if (this.loginForm.invalid) return;
     this.loginForm.get('username')?.disable();
     this.loginForm.get('password')?.disable();
-    this.loading.set(true);
+    this.$loading.set(true);
     const username = this.loginForm.get('username')?.value as string;
     const password = this.loginForm.get('password')?.value as string;
     this.authService.login(username, password).subscribe({
       next: () => {
-        this.loading.set(false);
+        this.$loading.set(false);
         this.router.navigate(['/home']);
       },
       error: (err) => {
-        this.loading.set(false);
+        this.$loading.set(false);
         this.loginForm.get('username')?.enable();
         this.loginForm.get('password')?.enable();
         if (err.status === 0) {
