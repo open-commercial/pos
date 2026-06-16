@@ -10,9 +10,9 @@
         <mat-icon>logout</mat-icon>
         <span>
           Cerrar Sesión{{
-            (this.loggedUser?.nombre || this.loggedUser?.apellido) ?
-              ' (' + (this.loggedUser.nombre || '') + ' ' + (this.loggedUser.apellido || '') + ')'
-              : ''
+            (this.loggedUser) ?
+            ' (' + (this.loggedUser.nombre || '') + ' ' + (this.loggedUser.apellido || '') + ')'
+            : ''
           }}
         </span>
       </button>
