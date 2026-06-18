@@ -10,14 +10,13 @@ import { Pagination } from '../models/pagination.model';
 export class CustomerAccountService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/api/v1/cuentas-corriente/clientes';
 
   search(criteria: BusquedaCuentaCorrienteClienteCriteria): Observable<Pagination> {
-    return this.http.post<Pagination>(`${this.baseUrl}/busqueda/criteria`, criteria);
+    return this.http.post<Pagination>(`${environment.apiUrl}/api/v1/cuentas-corriente/clientes/busqueda/criteria`, criteria);
   }
 
   getDefaultCustomerAccount(): Observable<CuentaCorrienteCliente> {
-    return this.http.get<CuentaCorrienteCliente>(`${this.baseUrl}/predeterminado`);
+    return this.http.get<CuentaCorrienteCliente>(`${environment.apiUrl}/api/v1/cuentas-corriente/clientes/predeterminado`);
   }
 
 }

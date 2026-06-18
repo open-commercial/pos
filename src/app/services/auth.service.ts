@@ -17,19 +17,17 @@ export class AuthService {
   storageService = inject(LocalStorageUtil);
   usuarioService = inject(UserService);
   jwtHelper = new JwtHelperService();
-  urlLogin = environment.apiUrl + '/api/v1/login';
-  urlLogout = environment.apiUrl + '/api/v1/logout';
 
   login(username: string, password: string) {
     const credential = { username: username, password: password };
-    return this.http.post(this.urlLogin, credential, { responseType: 'text' })
+    return this.http.post(`${environment.apiUrl}/api/v1/login`, credential, { responseType: 'text' })
       .pipe(tap((token) => {
         this.storageService.setItem(LocalStorageKeys.TOKEN, token);
       }));
   }
 
   logout() {
-    return this.http.put(this.urlLogout, {})
+    return this.http.put(`${environment.apiUrl}/api/v1/logout`, {})
       .pipe(tap(() => {
         this.storageService.removeItem(LocalStorageKeys.TOKEN);
         this.storageService.removeItem(LocalStorageKeys.CUSTOMER_ACCOUNT);

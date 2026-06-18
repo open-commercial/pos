@@ -8,13 +8,12 @@ import { Usuario } from '../models/usuario.model';
 export class UserService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/api/v1/usuarios';
 
   getUser(idUsuario: number): Observable<Usuario> {
-    return this.http.get<Usuario>(`${this.baseUrl}/${idUsuario}`);
+    return this.http.get<Usuario>(`${environment.apiUrl}/api/v1/usuarios/${idUsuario}`);
   }
   
   setDefaultBranch(idUsuario: number, idSucursal: number): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/${idUsuario}/sucursales/${idSucursal}`, {});
+    return this.http.put<void>(`${environment.apiUrl}/api/v1/usuarios/${idUsuario}/sucursales/${idSucursal}`, {});
   }
 }

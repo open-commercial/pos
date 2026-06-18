@@ -17,7 +17,6 @@ export class OrderService {
 
   http = inject(HttpClient);
   localStorageUtil = inject(LocalStorageUtil);
-  baseUrl = environment.apiUrl + '/api/v1/pedidos';
   private readonly _newOrder = signal<NuevoPedido>({});
   $newOrder = this._newOrder.asReadonly();
 
@@ -29,14 +28,14 @@ export class OrderService {
   }
 
   calculateOrderLines(nrp: NuevoRenglonPedido[]): Observable<RenglonPedido[]> {
-    return this.http.post<RenglonPedido[]>(`${this.baseUrl}/renglones`, nrp);
+    return this.http.post<RenglonPedido[]>(`${environment.apiUrl}/api/v1/pedidos/renglones`, nrp);
   }
 
   calculateOrderSummary(nrp: NuevosResultadosPedido): Observable<Resultados> {
-    return this.http.post<Resultados>(`${this.baseUrl}/calculo-pedido`, nrp);
+    return this.http.post<Resultados>(`${environment.apiUrl}/api/v1/pedidos/calculo-pedido`, nrp);
   }
 
-  addOrderLine(p: Producto) {    
+  addOrderLine(p: Producto) {
     this._newOrder.set({});
   }
 
@@ -45,7 +44,7 @@ export class OrderService {
   }
 
   saveOrder(np: NuevoPedido): Observable<Pedido> {
-    return this.http.post<Pedido>(this.baseUrl, np).pipe(
+    return this.http.post<Pedido>(`${environment.apiUrl}/api/v1/pedidos`, np).pipe(
       tap(() => this.localStorageUtil.removeItem(LocalStorageKeys.ORDER))
     );
   }

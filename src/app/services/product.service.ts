@@ -4,13 +4,13 @@ import { inject, Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
 import { BusquedaProductoCriteria } from '../models/busqueda-producto-criteria.model';
 import { Pagination } from '../models/pagination.model';
+import { ProductoFaltante } from '../models/producto-faltante.model';
+import { ProductosParaVerificarStock } from '../models/productos-para-verificar-stock.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/api/v1/productos';
-  criteriaUrl = this.baseUrl + '/busqueda/criteria';
 
   search(criteria: BusquedaProductoCriteria,
     idSucursal: number,
@@ -20,8 +20,12 @@ export class ProductService {
       query.append('idCliente', idCliente.toString());
     }
     const qs = query.toString();
-    const url = `${this.criteriaUrl}/sucursales/${idSucursal}${(qs ? '?' + qs : '')}`;
+    const url = `${environment.apiUrl}/api/v1/productos/busqueda/criteria/sucursales/${idSucursal}${(qs ? '?' + qs : '')}`;
     return this.http.post<Pagination>(url, criteria);
+  }
+
+  checkStockAvailability(payload: ProductosParaVerificarStock): Observable<ProductoFaltante[]> {
+    return this.http.post<ProductoFaltante[]>(`${environment.apiUrl}/api/v1/productos/disponibilidad-stock`, payload);
   }
 
 }

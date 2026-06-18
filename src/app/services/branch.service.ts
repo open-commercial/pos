@@ -8,15 +8,14 @@ import { environment } from 'src/environments/environment';
 export class BranchService {
 
   http = inject(HttpClient);
-  baseUrl = environment.apiUrl + '/api/v1/sucursales';
   $selectedSucursal = signal<Sucursal | null>(null);
 
   getBranches(): Observable<Array<Sucursal>> {
-    return this.http.get<Array<Sucursal>>(this.baseUrl);
+    return this.http.get<Array<Sucursal>>(`${environment.apiUrl}/api/v1/sucursales`);
   }
 
   getBranchById(idSucursal: number): Observable<Sucursal> {
-    return this.http.get<Sucursal>(`${this.baseUrl}/${idSucursal}`);
+    return this.http.get<Sucursal>(`${environment.apiUrl}/api/v1/sucursales/${idSucursal}`);
   }
 
 }
