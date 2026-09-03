@@ -12,7 +12,7 @@
 }
 
 <mat-dialog-content class="mat-typography" (scroll)="onCustomersScroll($event)">
-  <mat-selection-list #customersList [multiple]="false">
+  <mat-selection-list #customersList [multiple]="false" (keydown.enter)="onEnter(customersList)">
     @for (c of $customers(); track c) {
     <mat-list-option [value]="c" [selected]="c.cliente.idCliente === $selectedCustomerId()">
       {{c.cliente.nombreFiscal}} @if (c.cliente.nombreFantasia) {({{c.cliente.nombreFantasia}})}

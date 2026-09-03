@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, ElementRef, inject, QueryList, signal, ViewChild, ViewChildren, AfterViewInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -9,14 +9,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { DecimalPipe } from '@angular/common';
 import { OrderService } from '../../services/order.service';
 import { CustomerAccountService } from '../../services/customer-account.service';
+import { BranchService } from '../../services/branch.service';
 import { LocalStorageKeys, LocalStorageUtil } from '../../utils/local-storage-util';
 import { CuentaCorrienteCliente } from '../../models/cuenta-corriente-cliente.model';
-
-interface CheckoutItem {
-  qty: number;
-  desc: string;
-  price: number;
-}
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RenglonPedido } from '../../models/renglon-pedido.model';
+import { NuevoPedido } from '../../models/nuevo-pedido.model';
+import { FocusNavigationService } from '../../services/focus-navigation.service';
+import { TipoDeEnvio } from '../../models/tipo-de-envio';
 
 @Component({
   selector: 'app-checkout',
@@ -27,44 +27,100 @@ interface CheckoutItem {
     MatButtonModule,
     MatToolbarModule,
     MatListModule,
+    MatProgressSpinnerModule,
     DecimalPipe
   ]
 })
-export class CheckoutComponent {
+export class CheckoutComponent implements AfterViewInit {
 
   notificationService = inject(NotificationService);
   orderService = inject(OrderService);
   customerAccountService = inject(CustomerAccountService);
+  branchService = inject(BranchService);
+  focusNavigationService = inject(FocusNavigationService);
   storageService = inject(LocalStorageUtil);
   readonly dialog = inject(MatDialog);
   $customerName = signal('');
   $customerError = signal(false);
-  
-  items: CheckoutItem[] = [
-    {qty: 3, desc: 'Abrelatas Uña Pata 506 Loekemeyer', price: 4500.50},
-    {qty: 3, desc: 'ACCURATO Carnicero+Oficio ceramica TRAMONTINA 24199/090 para cocinero', price: 4500},
-    {qty: 1, desc: 'Aceite de Lino para Madera Doble Cocido Botella x 1 Litro', price: 1000},
-    {qty: 1, desc: 'Aceite de Lino para Madera Doble Cocido Botella x 1 Litro', price: 1000},
-    {qty: 3, desc: 'ACCURATO Carnicero+Oficio ceramica TRAMONTINA 24199/090 para cocinero', price: 4500},
-    {qty: 3, desc: 'Abrelatas Uña Pata 506 Loekemeyer', price: 4500.50},
-    {qty: 2, desc: 'Descripcion de producto 2', price: 2000},
-    {qty: 1, desc: 'Descripcion de producto 4', price: 300.50},
-    {qty: 3, desc: 'Descripcion de producto 1', price: 4500},
-    {qty: 1, desc: 'Descripcion de producto 3', price: 1000},
-    {qty: 2, desc: 'Descripcion de producto 2', price: 2000},
-    {qty: 1, desc: 'Descripcion de producto 4', price: 3000},
-    {qty: 3, desc: 'Descripcion de producto 1', price: 4500},
-    {qty: 1, desc: 'Descripcion de producto 3', price: 1000},
-    {qty: 2, desc: 'Descripcion de producto 2', price: 2000},
-    {qty: 1, desc: 'Descripcion de producto 5', price: 5000}
-  ];
+  $orderLines = signal<RenglonPedido[]>([]);
+  $loading = signal(false);
+  lastFocusedCheckoutIndex = 0;
+  private pendingRemoveFocus = false;
+  @ViewChildren('checkoutRow', { read: ElementRef }) checkoutRows!: QueryList<ElementRef<HTMLElement>>;
+  @ViewChild('checkoutBtn', { read: ElementRef }) checkoutBtn!: ElementRef<HTMLElement>;
 
   constructor() {
     effect(() => {
-      console.log(this.orderService.$newOrder());
+      const renglones = this.orderService.$newOrder().renglones ?? [];
+      if (renglones.length === 0) {
+        this.$orderLines.set([]);
+        return;
+      }
+      this.$loading.set(true);
+      this.orderService.calculateOrderLines(renglones).subscribe({
+        next: (lines) => { this.$orderLines.set(lines); this.$loading.set(false); },
+        error: () => { this.$orderLines.set([]); this.$loading.set(false); }
+      });
+    });
+
+    effect(() => {
+      if (this.focusNavigationService.$checkoutRowFocusRequest() > 0) {
+        setTimeout(() => this.focusCheckoutRow(this.lastFocusedCheckoutIndex), 0);
+      }
     });
 
     this.loadDefaultCustomer();
+  }
+
+  ngAfterViewInit() {
+    this.checkoutRows.changes.subscribe(() => {
+      if (!this.pendingRemoveFocus || this.$loading() || this.orderService.$updatingOrder()) {
+        return;
+      }
+      this.pendingRemoveFocus = false;
+      const rows = this.checkoutRows.toArray();
+      if (rows.length > 0) {
+        setTimeout(() => this.focusCheckoutRow(this.lastFocusedCheckoutIndex), 0);
+      } else {
+        this.focusNavigationService.requestQtyInputFocus();
+      }
+    });
+  }
+
+  focusCheckoutRow(index: number) {
+    const rows = this.checkoutRows?.toArray() ?? [];
+    if (rows.length === 0) {
+      this.checkoutBtn?.nativeElement.focus();
+      return;
+    }
+    rows[Math.min(index, rows.length - 1)]?.nativeElement.focus();
+  }
+
+  onCheckoutRowKeyDown(event: KeyboardEvent, index: number) {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const rows = this.checkoutRows.toArray();
+      const target = event.key === 'ArrowDown' ? rows[index + 1] : rows[index - 1];
+      target?.nativeElement.focus();
+    } else if (event.key === 'Tab' && !event.shiftKey) {
+      event.preventDefault();
+      setTimeout(() => document.querySelector<HTMLElement>('.checkout-btn')?.focus(), 0);
+    } else if (event.key === 'Tab' && event.shiftKey) {
+      event.preventDefault();
+      this.focusNavigationService.requestQtyInputFocus();
+    }
+  }
+
+  onCheckoutBtnKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Tab' && event.shiftKey) {
+      event.preventDefault();
+      const rows = this.checkoutRows.toArray();
+      if (rows.length > 0) {
+        this.focusCheckoutRow(this.lastFocusedCheckoutIndex);
+      } else {
+        this.focusNavigationService.requestQtyInputFocus();
+      }
+    }
   }
 
   loadDefaultCustomer() {
@@ -89,21 +145,57 @@ export class CheckoutComponent {
   }
 
   total(): number {
-    return this.items.reduce((sum, item) => sum + item.qty * item.price, 0);
+    return this.$orderLines().reduce((sum, item) => sum + item.importe, 0);
   }
 
-  addItem() {
-    this.items.push({qty: 1, desc: 'Nuevo producto', price: 1000});
-    this.notificationService.openSnackBar('✅ Se agregó "Nuevo producto" a la lista', '', 3000);
+  removeItem(item: RenglonPedido, index: number) {
+    this.pendingRemoveFocus = true;
+    this.lastFocusedCheckoutIndex = index;
+    const renglones = (this.orderService.$newOrder().renglones ?? [])
+      .filter(r => r.idProductoItem !== item.idProductoItem);
+    this.orderService.setOrderLines(renglones);
+    this.notificationService.openSnackBar(`❌ Se quitó "${item.descripcionItem}" de la lista`, '', 3000);
   }
 
-  removeItem(item: CheckoutItem) {
-    this.items = this.items.filter(i => i !== item);
-    this.notificationService.openSnackBar("❌ Se quitó \"" + item.desc + "\" de la lista", '', 3000);
-  }
+  sendOrder() {
+    if (this.$orderLines().length === 0 || this.$loading() || this.orderService.$updatingOrder()) {
+      return;
+    }
 
-  finalize() {
-    alert('Compra finalizada');
+    const storedCustomerAccount = this.storageService.getItem(LocalStorageKeys.CUSTOMER_ACCOUNT) as CuentaCorrienteCliente | null;
+    const currentOrder = this.orderService.$newOrder();
+    const selectedSucursal = this.branchService.$selectedSucursal();
+    const idCliente = storedCustomerAccount?.cliente?.idCliente;
+
+    if (!selectedSucursal || !idCliente) {
+      this.notificationService.openSnackBar('❌ No se pudo obtener la sucursal o el cliente del pedido', '', 5000);
+      return;
+    }
+
+    const nuevoPedido: NuevoPedido = {
+      idSucursal: selectedSucursal.idSucursal,
+      observaciones: currentOrder.observaciones ?? '',
+      idCliente,
+      tipoDeEnvio: currentOrder.tipoDeEnvio ?? TipoDeEnvio.RETIRO_EN_SUCURSAL,
+      renglones: currentOrder.renglones ?? [],
+      idsFormaDePago: currentOrder.idsFormaDePago ?? [],
+      montos: currentOrder.montos ?? [],
+      recargoPorcentaje: currentOrder.recargoPorcentaje ?? 0,
+      descuentoPorcentaje: currentOrder.descuentoPorcentaje ?? 0
+    };
+
+    this.orderService.setUpdatingOrder(true);
+    this.orderService.saveOrder(nuevoPedido).subscribe({
+      next: () => {
+        this.orderService.setUpdatingOrder(false);
+        this.orderService.setOrderLines([]);
+        this.notificationService.openSnackBar('✅ Pedido guardado con éxito', '', 5000);
+      },
+      error: () => {
+        this.orderService.setUpdatingOrder(false);
+        this.notificationService.openSnackBar('❌ No se pudo guardar el pedido. Intente nuevamente', '', 5000);
+      }
+    });
   }
 
   openSearchCustomerDialog() {

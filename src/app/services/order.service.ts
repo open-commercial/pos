@@ -17,8 +17,14 @@ export class OrderService {
 
   http = inject(HttpClient);
   localStorageUtil = inject(LocalStorageUtil);
-  private readonly _newOrder = signal<NuevoPedido>({});
+  private readonly _newOrder = signal<Partial<NuevoPedido>>({});
   $newOrder = this._newOrder.asReadonly();
+  private readonly _updatingOrder = signal(false);
+  $updatingOrder = this._updatingOrder.asReadonly();
+
+  setUpdatingOrder(value: boolean) {
+    this._updatingOrder.set(value);
+  }
 
   constructor() {
     const storedOrder = this.localStorageUtil.getItem(LocalStorageKeys.ORDER);
@@ -35,12 +41,27 @@ export class OrderService {
     return this.http.post<Resultados>(`${environment.apiUrl}/api/v1/pedidos/calculo-pedido`, nrp);
   }
 
+  setOrderLines(orderLines: Array<NuevoRenglonPedido>) {
+    const updatedOrder: Partial<NuevoPedido> = { ...this._newOrder(), renglones: orderLines };
+    this._newOrder.set(updatedOrder);
+    this.localStorageUtil.setItem(LocalStorageKeys.ORDER, updatedOrder);
+  }
+
   addOrderLine(p: Producto) {
-    this._newOrder.set({});
+    const currentLines = this._newOrder().renglones ?? [];
+    const existing = currentLines.find(r => r.idProductoItem === p.idProducto);
+    const updatedLines = existing
+      ? currentLines.map(r => r.idProductoItem === p.idProducto ? { ...r, cantidad: r.cantidad + 1 } : r)
+      : [...currentLines, { idProductoItem: p.idProducto, cantidad: 1 }];
+    this.setOrderLines(updatedLines);
   }
 
   removeOrderLine(p: Producto) {
-    this._newOrder.set({});
+    const currentLines = this._newOrder().renglones ?? [];
+    const updatedLines = currentLines
+      .map(r => r.idProductoItem === p.idProducto ? { ...r, cantidad: r.cantidad - 1 } : r)
+      .filter(r => r.cantidad > 0);
+    this.setOrderLines(updatedLines);
   }
 
   saveOrder(np: NuevoPedido): Observable<Pedido> {

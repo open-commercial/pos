@@ -6,8 +6,8 @@
   .checkout-header {
     display: flex;
     align-items: center;
-    margin-top: 1.5rem;
-    margin-bottom: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
     min-height: 2.5rem;
 
     .customer-name {
@@ -56,17 +56,36 @@
     overflow-y: auto;
     justify-content: center;
 
+    .spinner-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1 1 auto;
+    }
+
     .empty-message {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 0.5rem;
+      font-size: 1.2rem;
       color: gray;
+
+      .empty-cart-image {
+        width: 8rem;
+        height: 8rem;
+      }
     }
 
     .checkout-item {
       flex: 0 0 auto;
+
+      button:focus {
+        mat-icon {
+          color: var(--mdc-theme-primary, #3f51b5);
+        }
+      }
 
       .checkout-qty {
         font-size: 1.2rem;
@@ -111,6 +130,10 @@
     .checkout-btn {
       font-size: 2rem;
       height: 4.5rem;
+
+      &.checkout-btn-disabled {
+        opacity: 0.5;
+      }
     }
   }
 }

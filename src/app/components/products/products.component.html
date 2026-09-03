@@ -21,6 +21,7 @@
     <mat-form-field appearance="outline" class="form-field" subscriptSizing="dynamic">
       <mat-label>Buscar productos</mat-label>
       <input matInput type="text" (input)="$searchCriteria.set($any($event.target).value)"
+             (keydown)="onSearchKeyDown($event)"
              #productSearchInput [disabled]="$loading()"/>
       @if ($searchCriteria()) {
         <button matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()" tabindex="-1"
@@ -47,7 +48,7 @@
             <div class="product-price">${{ p.precioLista | number: '1.0-2' }}</div>
             <div class="product-stock"> {{ getAvailableQuantityForSelectedBranch(p) }} {{ p.nombreMedida }}</div>
             <div class="product-quantity">
-              <button mat-icon-button (click)="decreaseQuantity(p)" tabindex="-1">
+              <button mat-icon-button (click)="decreaseQuantity(p, qtyInput)" tabindex="-1" [disabled]="$loading() || orderService.$updatingOrder()">
                 <mat-icon>remove</mat-icon>
               </button>
               <mat-form-field appearance="outline" class="input-container" subscriptSizing="dynamic">
@@ -55,9 +56,14 @@
                        [max]="getAvailableQuantityForSelectedBranch(p)"
                        [value]="getProductQuantityInOrder(p)"
                        (input)="onQuantityChange(p, $event)"
-                       (blur)="formatQuantity($event)"/>
+                       (blur)="formatQuantity($event)"
+                       (focus)="lastFocusedQtyIndex = $index"
+                       (keydown)="onQuantityKeyDown($event, $index)"
+                       [disabled]="$loading() || orderService.$updatingOrder()"
+                       tabindex="-1"
+                       #qtyInput/>
               </mat-form-field>
-              <button mat-icon-button (click)="increaseQuantity(p)" tabindex="-1">
+              <button mat-icon-button (click)="increaseQuantity(p, qtyInput)" tabindex="-1" [disabled]="$loading() || orderService.$updatingOrder()">
                 <mat-icon>add</mat-icon>
               </button>
             </div>
@@ -71,7 +77,10 @@
       </div>
     }
     @if (!$loading() && $products().length === 0) {
-      <span class="no-results">No existen productos que coincidan con la búsqueda</span>
+      <div class="no-results">
+        <img class="no-results-image" src="assets/no-products.svg" alt="" />
+        <span>No existen productos que coincidan con la búsqueda</span>
+      </div>
     }
   </div>
 </div>

@@ -2,7 +2,7 @@ import { Component, effect, ElementRef, inject, signal, ViewChild } from '@angul
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatListModule } from '@angular/material/list';
+import { MatListModule, MatSelectionList } from '@angular/material/list';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
@@ -132,6 +132,15 @@ export class SearchCustomerDialogComponent {
         this.infiniteScrollPage += 1;
         this.searchCustomers(this.$searchCriteria());
       }
+    }
+  }
+
+  onEnter(customersList: MatSelectionList) {
+    if (this.$loading()) return;
+    const selected = customersList.selectedOptions.selected[0]?.value as CuentaCorrienteCliente | undefined;
+    const customer = selected ?? this.$customers()[0];
+    if (customer) {
+      this.selectCustomerAccount(customer);
     }
   }
 

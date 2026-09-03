@@ -18,19 +18,26 @@
   </mat-toolbar>
 
   <div class="checkout-list">
-    @if (items.length === 0) {
+    @if ($loading() || orderService.$updatingOrder()) {
+      <div class="spinner-container">
+        <mat-spinner diameter="40" />
+      </div>
+    } @else if ($orderLines().length === 0) {
       <div class="empty-message">
+        <img class="empty-cart-image" src="assets/empty-cart.svg" alt="" />
         <span>Agrega productos para verlos listados aquí</span>
       </div>
     } @else {
       <mat-toolbar>
-        @for (item of items; track item) {
+        @for (item of $orderLines(); track item.idProductoItem) {
           <mat-toolbar-row class="checkout-item">
-            <span class="checkout-qty">{{ item.qty }}x</span>
-            <span class="checkout-desc">{{ item.desc }}</span>
+            <span class="checkout-qty">{{ item.cantidad }}x</span>
+            <span class="checkout-desc">{{ item.descripcionItem }}</span>
             <span class="spacer"></span>
-            <span class="checkout-price">${{ item.price | number: '1.0-2' }}</span>
-            <button matIconButton (click)="removeItem(item)">
+            <span class="checkout-price">${{ item.importe | number: '1.0-2' }}</span>
+            <button matIconButton (click)="removeItem(item, $index)" [tabIndex]="-1"
+                    #checkoutRow (keydown)="onCheckoutRowKeyDown($event, $index)"
+                    (focus)="lastFocusedCheckoutIndex = $index">
               <mat-icon>close</mat-icon>
             </button>
           </mat-toolbar-row>
@@ -44,7 +51,9 @@
       <span class="total-label"><b>TOTAL</b></span>
       <span class="total-value"><b>${{ total() | number: '1.0-2' }}</b></span>
     </div>
-    <button matButton="filled" class="checkout-btn" (click)="finalize()">
+    <button matButton="filled" class="checkout-btn" #checkoutBtn (click)="sendOrder()" (keydown)="onCheckoutBtnKeyDown($event)"
+            [class.checkout-btn-disabled]="$orderLines().length === 0"
+            [disabled]="$loading() || orderService.$updatingOrder()">
       <span>Finalizar</span>
     </button>
   </div>
