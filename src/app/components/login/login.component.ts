@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService, SERVICE_UNAVAILABLE_MESSAGE } from 'src/app/services/auth.service';
-import { CommonModule } from '@angular/common';
+
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,13 +14,12 @@ import { NotificationService } from 'src/app/services/notification.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatProgressSpinnerModule
-  ]
+]
 })
 export class LoginComponent {
 
