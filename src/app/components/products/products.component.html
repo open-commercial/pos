@@ -1,63 +1,86 @@
-<div class="app-products">
-
+<div class="products-container">
   <div class="search-container">
     <img class="logo" src="assets/logo.png" alt="Logo" [matMenuTriggerFor]="menu" #menuTrigger>
     <mat-menu #menu="matMenu">
-      <button mat-menu-item (click)="openGlobalMenuDialog()">
+      <button mat-menu-item (click)="openSearchBranchDialog()">
         <mat-icon>store</mat-icon>
-        <span>Cambiar Sucursal ({{ selectedSucursal?.nombre }})</span>
+        <span>Cambiar Sucursal ({{ this.branchService.$selectedSucursal()?.nombre }})</span>
       </button>
       <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
-        <span>Cerrar Sesión (Jhon Doe)</span>
+        <span>
+          Cerrar Sesión{{
+            (this.loggedUser) ?
+            ' (' + (this.loggedUser.nombre || '') + ' ' + (this.loggedUser.apellido || '') + ')'
+            : ''
+          }}
+        </span>
       </button>
     </mat-menu>
 
-    <mat-form-field appearance="outline" class="form-field">
+    <mat-form-field appearance="outline" class="form-field" subscriptSizing="dynamic">
       <mat-label>Buscar productos</mat-label>
-      <input matInput type="text" [(ngModel)]="searchCriteria">
-      @if (searchCriteria) {
-      <button matSuffix matIconButton aria-label="Clear" (click)="searchCriteria=''" tabindex="-1">
-        <mat-icon>close</mat-icon>
-      </button>
+      <input matInput type="text" (input)="$searchCriteria.set($any($event.target).value)"
+             (keydown)="onSearchKeyDown($event)"
+             #productSearchInput [disabled]="$loading()"/>
+      @if ($searchCriteria()) {
+        <button matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()" tabindex="-1"
+                [disabled]="$loading()">
+          <mat-icon>close</mat-icon>
+        </button>
       }
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
   </div>
 
-  <div class="products-container">
-    @if (loadingService.active()) {
-    <div class="spinner">
-      <mat-spinner></mat-spinner>
-    </div>
-    } @else {
-    @for (p of products; track p) {
-    <mat-card appearance="outlined">
-      <mat-card-content>
-        <div class="product-content">
-          <div class="product-image">
-            <img mat-card-image [src]="p.urlImagen ? p.urlImagen : 'assets/sin_imagen.png'" alt="Foto">
+  <div class="products-list-container" (scroll)="onProductsScroll($event)">
+    @for (p of $products(); track p) {
+      <mat-card appearance="outlined" class="product-card">
+        <mat-card-content>
+          <div class="product-content">
+            <div class="product-image">
+              <img mat-card-image [src]="p.urlImagen ? p.urlImagen : 'assets/sin_imagen.png'" alt="Foto">
+            </div>
+            <div class="product-info">
+              <div class="product-code">{{ p.codigo }}</div>
+              <div class="product-description">{{ p.descripcion }}</div>
+            </div>
+            <div class="product-price">${{ p.precioLista | number: '1.0-2' }}</div>
+            <div class="product-stock"> {{ getAvailableQuantityForSelectedBranch(p) }} {{ p.nombreMedida }}</div>
+            <div class="product-quantity">
+              <button mat-icon-button (click)="decreaseQuantity(p, qtyInput)" tabindex="-1" [disabled]="$loading() || orderService.$updatingOrder()">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <mat-form-field appearance="outline" class="input-container" subscriptSizing="dynamic">
+                <input matInput required type="number" min="0" class="quantity-input"
+                       [max]="getAvailableQuantityForSelectedBranch(p)"
+                       [value]="getProductQuantityInOrder(p)"
+                       (input)="onQuantityChange(p, $event)"
+                       (blur)="formatQuantity($event)"
+                       (focus)="lastFocusedQtyIndex = $index"
+                       (keydown)="onQuantityKeyDown($event, $index)"
+                       [disabled]="$loading() || orderService.$updatingOrder()"
+                       tabindex="-1"
+                       #qtyInput/>
+              </mat-form-field>
+              <button mat-icon-button (click)="increaseQuantity(p, qtyInput)" tabindex="-1" [disabled]="$loading() || orderService.$updatingOrder()">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
           </div>
-          <div class="product-info">
-            <div class="product-code">{{ p.codigo }}</div>
-            <div class="product-description">{{ p.descripcion }}</div>
-          </div>
-          <div class="product-price">${{ p.precioLista | number: '1.0-2' }}</div>
-          <div class="product-stock"> {{ getCantidadDisponibleDeSurcusalSelecionada(p) }} {{ p.nombreMedida }}</div>
-          <div class="product-quantity">
-            <button mat-icon-button (click)="decreaseQuantity(p)" tabindex="-1">
-              <mat-icon>remove</mat-icon>
-            </button>
-            <mat-form-field appearance="outline" class="input-container">
-              <input matInput required type="number" min="0" class="quantity-input" [value]="0"/>
-            </mat-form-field>
-            <button mat-icon-button (click)="increaseQuantity(p)" tabindex="-1">
-              <mat-icon>add</mat-icon>
-            </button>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
+        </mat-card-content>
+      </mat-card>
     }
+    @if ($loading()) {
+      <div class="spinner">
+        <mat-spinner diameter="50"></mat-spinner>
+      </div>
+    }
+    @if (!$loading() && $products().length === 0) {
+      <div class="no-results">
+        <img class="no-results-image" src="assets/no-products.svg" alt="" />
+        <span>No existen productos que coincidan con la búsqueda</span>
+      </div>
     }
   </div>
+</div>
