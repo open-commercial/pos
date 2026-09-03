@@ -1,6 +1,6 @@
 import { Usuario } from '../models/usuario.model';
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { LocalStorageKeys, LocalStorageUtil } from '../utils/local-storage-util';
 import { JwtHelperService } from '@auth0/angular-jwt';
@@ -10,7 +10,7 @@ import { UserService } from './user.service';
 
 export const SERVICE_UNAVAILABLE_MESSAGE = 'Servicio no disponible :(';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class AuthService {
 
   http = inject(HttpClient);

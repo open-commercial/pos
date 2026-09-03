@@ -1,12 +1,12 @@
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { BusquedaCuentaCorrienteClienteCriteria } from '../models/busqueda-cuenta-corriente-cliente-criteria.model';
 import { CuentaCorrienteCliente } from '../models/cuenta-corriente-cliente.model';
 import { Pagination } from '../models/pagination.model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class CustomerAccountService {
 
   http = inject(HttpClient);

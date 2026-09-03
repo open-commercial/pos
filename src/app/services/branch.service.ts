@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, signal, Service } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Sucursal } from '../models/sucursal.model';
 import { environment } from 'src/environments/environment';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class BranchService {
 
   http = inject(HttpClient);

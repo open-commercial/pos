@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import crypto from 'crypto-js';
 
 export enum LocalStorageKeys {
@@ -7,7 +7,7 @@ export enum LocalStorageKeys {
   CUSTOMER_ACCOUNT = 'customer_account'
 }
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class LocalStorageUtil {
 
   getItem(key: string) {

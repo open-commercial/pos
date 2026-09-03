@@ -1,6 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { signal, Service } from '@angular/core';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class FocusNavigationService {
 
   private readonly _qtyInputFocusRequest = signal(0);

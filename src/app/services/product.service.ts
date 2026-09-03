@@ -1,13 +1,13 @@
 import { Observable } from 'rxjs';
 import { HttpClient } from "@angular/common/http";
-import { inject, Injectable } from "@angular/core";
+import { inject, Service } from "@angular/core";
 import { environment } from "src/environments/environment";
 import { BusquedaProductoCriteria } from '../models/busqueda-producto-criteria.model';
 import { Pagination } from '../models/pagination.model';
 import { ProductoFaltante } from '../models/producto-faltante.model';
 import { ProductosParaVerificarStock } from '../models/productos-para-verificar-stock.model';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ProductService {
 
   http = inject(HttpClient);

@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, signal, Service } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { NuevoRenglonPedido } from '../models/nuevo-renglon-pedido.model';
 import { RenglonPedido } from '../models/renglon-pedido.model';
@@ -12,7 +12,7 @@ import { NuevoPedido } from '../models/nuevo-pedido.model';
 import { Producto } from "../models/producto.model";
 import { LocalStorageKeys, LocalStorageUtil } from "../utils/local-storage-util";
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class OrderService {
 
   http = inject(HttpClient);
