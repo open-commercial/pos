@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, QueryList, signal, ViewChild, ViewChildren, AfterViewInit } from '@angular/core';
+import { Component, effect, ElementRef, inject, QueryList, signal, ViewChild, ViewChildren, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -22,6 +22,7 @@ import { TipoDeEnvio } from '../../models/tipo-de-envio';
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatIconModule,
     MatButtonModule,

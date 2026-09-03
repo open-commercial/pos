@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatListModule, MatSelectionListChange } from '@angular/material/list';
@@ -15,6 +15,7 @@ import { switchMap } from 'rxjs';
   selector: 'app-search-branch-dialog',
   templateUrl: './search-branch-dialog.component.html',
   styleUrls: ['./search-branch-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatDialogContent,
     MatDialogActions,

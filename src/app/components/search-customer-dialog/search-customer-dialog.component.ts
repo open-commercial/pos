@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, signal, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -18,6 +18,7 @@ import { LocalStorageKeys, LocalStorageUtil } from 'src/app/utils/local-storage-
   selector: 'app-search-customer-dialog',
   templateUrl: './search-customer-dialog.component.html',
   styleUrls: ['./search-customer-dialog.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     MatDialogContent,
     MatDialogActions,
