@@ -3,6 +3,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { NotificationService } from 'src/app/services/notification.service';
 import { SearchCustomerDialogComponent } from '../search-customer-dialog/search-customer-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -17,6 +19,9 @@ import { RenglonPedido } from '../../models/renglon-pedido.model';
 import { NuevoPedido } from '../../models/nuevo-pedido.model';
 import { FocusNavigationService } from '../../services/focus-navigation.service';
 import { TipoDeEnvio } from '../../models/tipo-de-envio';
+import { PaymentMethodService } from '../../services/payment-method.service';
+import { FormaDePago } from '../../models/forma-de-pago.model';
+import { TipoDeComprobante } from '../../models/tipo-de-comprobante';
 
 @Component({
   selector: 'app-checkout',
@@ -29,16 +34,24 @@ import { TipoDeEnvio } from '../../models/tipo-de-envio';
     MatToolbarModule,
     MatListModule,
     MatProgressSpinnerModule,
+    MatFormFieldModule,
+    MatSelectModule,
     DecimalPipe
   ]
 })
 export class CheckoutComponent implements AfterViewInit {
+
+  readonly $paymentMethods = signal<FormaDePago[]>([]);
+  readonly $selectedPaymentMethod = signal<FormaDePago | null>(null);
+  readonly $receiptTypes = Object.values(TipoDeComprobante);
+  readonly $selectedReceiptType = signal(TipoDeComprobante.TIQUE_PRESUPUESTO);
 
   notificationService = inject(NotificationService);
   orderService = inject(OrderService);
   customerAccountService = inject(CustomerAccountService);
   branchService = inject(BranchService);
   focusNavigationService = inject(FocusNavigationService);
+  paymentMethodService = inject(PaymentMethodService);
   storageService = inject(LocalStorageUtil);
   readonly dialog = inject(MatDialog);
   $customerName = signal('');
@@ -49,6 +62,8 @@ export class CheckoutComponent implements AfterViewInit {
   private pendingRemoveFocus = false;
   @ViewChildren('checkoutRow', { read: ElementRef }) checkoutRows!: QueryList<ElementRef<HTMLElement>>;
   @ViewChild('checkoutBtn', { read: ElementRef }) checkoutBtn!: ElementRef<HTMLElement>;
+  @ViewChild('receiptTypeSelect') receiptTypeSelect!: MatSelect;
+  @ViewChild('paymentMethodSelect') paymentMethodSelect!: MatSelect;
 
   constructor() {
     effect(() => {
@@ -71,6 +86,7 @@ export class CheckoutComponent implements AfterViewInit {
     });
 
     this.loadDefaultCustomer();
+    this.loadPaymentMethods();
   }
 
   ngAfterViewInit() {
@@ -105,15 +121,18 @@ export class CheckoutComponent implements AfterViewInit {
       target?.nativeElement.focus();
     } else if (event.key === 'Tab' && !event.shiftKey) {
       event.preventDefault();
-      setTimeout(() => document.querySelector<HTMLElement>('.checkout-btn')?.focus(), 0);
+      setTimeout(() => this.receiptTypeSelect?.focus(), 0);
     } else if (event.key === 'Tab' && event.shiftKey) {
       event.preventDefault();
       this.focusNavigationService.requestQtyInputFocus();
     }
   }
 
-  onCheckoutBtnKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Tab' && event.shiftKey) {
+  onPaymentMethodKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Tab' && !event.shiftKey) {
+      event.preventDefault();
+      this.checkoutBtn?.nativeElement.focus();
+    } else if (event.key === 'Tab' && event.shiftKey) {
       event.preventDefault();
       const rows = this.checkoutRows.toArray();
       if (rows.length > 0) {
@@ -121,6 +140,28 @@ export class CheckoutComponent implements AfterViewInit {
       } else {
         this.focusNavigationService.requestQtyInputFocus();
       }
+    }
+  }
+
+  onReceiptTypeKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Tab' && !event.shiftKey) {
+      event.preventDefault();
+      this.paymentMethodSelect?.focus();
+    } else if (event.key === 'Tab' && event.shiftKey) {
+      event.preventDefault();
+      const rows = this.checkoutRows.toArray();
+      if (rows.length > 0) {
+        this.focusCheckoutRow(this.lastFocusedCheckoutIndex);
+      } else {
+        this.focusNavigationService.requestQtyInputFocus();
+      }
+    }
+  }
+
+  onCheckoutBtnKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Tab' && event.shiftKey) {
+      event.preventDefault();
+      this.receiptTypeSelect?.focus();
     }
   }
 
@@ -143,6 +184,24 @@ export class CheckoutComponent implements AfterViewInit {
         this.$customerError.set(true);
       }
     });
+  }
+
+  loadPaymentMethods() {
+    this.paymentMethodService.getPaymentMethods().subscribe({
+      next: (paymentMethods) => {
+        this.$paymentMethods.set(paymentMethods);
+        this.selectDefaultPaymentMethod();
+      },
+      error: () => {
+        this.notificationService.openSnackBar('❌ No se pudo cargar la lista de formas de pago', '', 5000);
+      }
+    });
+  }
+
+  selectDefaultPaymentMethod() {
+    const paymentMethods = this.$paymentMethods();
+    const defaultPaymentMethod = paymentMethods.find(pm => pm.predeterminado) ?? paymentMethods[0] ?? null;
+    this.$selectedPaymentMethod.set(defaultPaymentMethod);
   }
 
   total(): number {
@@ -173,14 +232,20 @@ export class CheckoutComponent implements AfterViewInit {
       return;
     }
 
+    const selectedPaymentMethod = this.$selectedPaymentMethod();
+    if (!selectedPaymentMethod) {
+      this.notificationService.openSnackBar('❌ Debe seleccionar una forma de pago', '', 5000);
+      return;
+    }
+
     const nuevoPedido: NuevoPedido = {
       idSucursal: selectedSucursal.idSucursal,
       observaciones: currentOrder.observaciones ?? '',
       idCliente,
       tipoDeEnvio: currentOrder.tipoDeEnvio ?? TipoDeEnvio.RETIRO_EN_SUCURSAL,
       renglones: currentOrder.renglones ?? [],
-      idsFormaDePago: currentOrder.idsFormaDePago ?? [],
-      montos: currentOrder.montos ?? [],
+      idsFormaDePago: [selectedPaymentMethod.idFormaDePago],
+      montos: [this.total()],
       recargoPorcentaje: currentOrder.recargoPorcentaje ?? 0,
       descuentoPorcentaje: currentOrder.descuentoPorcentaje ?? 0
     };
@@ -190,7 +255,9 @@ export class CheckoutComponent implements AfterViewInit {
       next: () => {
         this.orderService.setUpdatingOrder(false);
         this.orderService.setOrderLines([]);
-        this.notificationService.openSnackBar('✅ Pedido guardado con éxito', '', 5000);
+        this.selectDefaultPaymentMethod();
+        this.$selectedReceiptType.set(TipoDeComprobante.TIQUE_PRESUPUESTO);
+        this.notificationService.openSnackBar('✅ Pedido guardado!', '', 5000);
       },
       error: () => {
         this.orderService.setUpdatingOrder(false);
@@ -208,42 +275,4 @@ export class CheckoutComponent implements AfterViewInit {
       }
     });
   }
-
-  /*
-  getNuevoPedido() {
-    let te: TipoDeEnvio;
-
-    if (this.form.get('opcionEnvio').value === OpcionEnvio.RETIRO_EN_SUCURSAL) {
-      te = TipoDeEnvio.RETIRO_EN_SUCURSAL;
-    } else {
-      const opcionEnvioUbicacion = this.form.get('opcionEnvioUbicacion').value;
-      te = opcionEnvioUbicacion === OpcionEnvioUbicacion.USAR_UBICACION_FACTURACION ?
-        TipoDeEnvio.USAR_UBICACION_FACTURACION : TipoDeEnvio.USAR_UBICACION_ENVIO;
-    }
-
-    const ccc: CuentaCorrienteCliente = this.form.get('ccc').value;
-    const renglones = this.form.get('renglonesPedido').value && this.form.get('renglonesPedido').value.length
-      ? this.form.get('renglonesPedido').value : [];
-
-    const resultados: Resultados = this.form.get('resultados').value ? this.form.get('resultados').value : null;
-
-    return {
-      idPedido: this.form.get('idPedido').value,
-      observaciones: this.form.get('observaciones').value,
-      idSucursal: this.sucursalesService.getIdSucursal(),
-      tipoDeEnvio: te,
-      idCliente: ccc && ccc.cliente ? ccc.cliente.idCliente : null,
-      renglones: renglones.map(r => {
-        return {
-          idProductoItem: r.renglonPedido.idProductoItem,
-          cantidad: r.renglonPedido.cantidad,
-        };
-      }),
-      idsFormaDePago: this.form.get('pagos').value.map((e) => Number(e.idFormaDePago)),
-      montos: this.form.get('pagos').value.map((e) => e.monto),
-      recargoPorcentaje: resultados && resultados.recargoPorcentaje ? resultados.recargoPorcentaje : 0,
-      descuentoPorcentaje: resultados && resultados.descuentoPorcentaje ? resultados.descuentoPorcentaje : 0,
-    };
-  }
-  */
 }

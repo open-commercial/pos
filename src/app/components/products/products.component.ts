@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, QueryList, signal, ViewChild, ViewChildren, ChangeDetectionStrategy } from '@angular/core';
+import { Component, effect, ElementRef, inject, QueryList, signal, untracked, ViewChild, ViewChildren, ChangeDetectionStrategy } from '@angular/core';
 import { ProductService } from 'src/app/services/product.service';
 import { BranchService } from 'src/app/services/branch.service';
 import { CommonModule, DecimalPipe } from '@angular/common';
@@ -81,6 +81,13 @@ export class ProductsComponent {
     effect(() => {
       if (this.focusNavigationService.$qtyInputFocusRequest() > 0) {
         setTimeout(() => this.focusQtyInput(this.lastFocusedQtyIndex), 0);
+      }
+    });
+
+    effect(() => {
+      if (this.orderService.$orderSaved() > 0) {
+        this.infiniteScrollPage = 0;
+        this.searchProducts(untracked(this.$searchCriteria));
       }
     });
 

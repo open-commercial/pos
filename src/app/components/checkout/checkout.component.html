@@ -47,9 +47,36 @@
   </div>
 
   <div class="checkout-total">
+    <mat-form-field appearance="outline" class="payment-method-field" subscriptSizing="dynamic">
+      <mat-label>Tipo de comprobante</mat-label>
+      <mat-select #receiptTypeSelect [value]="$selectedReceiptType()"
+                  (selectionChange)="$selectedReceiptType.set($event.value)"
+                  (keydown)="onReceiptTypeKeyDown($event)" [disabled]="$loading() || orderService.$updatingOrder()">
+        @for (option of $receiptTypes; track option) {
+          <mat-option [value]="option">{{ option }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="payment-method-field" subscriptSizing="dynamic">
+      <mat-label>Forma de pago</mat-label>
+      <mat-select #paymentMethodSelect [value]="$selectedPaymentMethod()" (selectionChange)="$selectedPaymentMethod.set($event.value)"
+                  (keydown)="onPaymentMethodKeyDown($event)" [disabled]="$loading() || orderService.$updatingOrder()">
+        @for (option of $paymentMethods(); track option.idFormaDePago) {
+          <mat-option [value]="option">{{ option.nombre }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
     <div class="total-labels">
       <span class="total-label"><b>TOTAL</b></span>
-      <span class="total-value"><b>${{ total() | number: '1.0-2' }}</b></span>
+      <span class="total-value">
+        <b>
+          @if ($loading() || orderService.$updatingOrder()) {
+            $...
+          } @else {
+            ${{ total() | number: '1.0-2' }}
+          }
+        </b>
+      </span>
     </div>
     <button matButton="filled" class="checkout-btn" #checkoutBtn (click)="sendOrder()" (keydown)="onCheckoutBtnKeyDown($event)"
             [class.checkout-btn-disabled]="$orderLines().length === 0"

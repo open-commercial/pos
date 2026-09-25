@@ -17,20 +17,17 @@ export class OrderService {
 
   http = inject(HttpClient);
   localStorageUtil = inject(LocalStorageUtil);
-  private readonly _newOrder = signal<Partial<NuevoPedido>>({});
+  private readonly _newOrder = signal<Partial<NuevoPedido>>(
+    this.localStorageUtil.getItem(LocalStorageKeys.ORDER) ?? {}
+  );
   $newOrder = this._newOrder.asReadonly();
   private readonly _updatingOrder = signal(false);
   $updatingOrder = this._updatingOrder.asReadonly();
+  private readonly _orderSaved = signal(0);
+  $orderSaved = this._orderSaved.asReadonly();
 
   setUpdatingOrder(value: boolean) {
     this._updatingOrder.set(value);
-  }
-
-  constructor() {
-    const storedOrder = this.localStorageUtil.getItem(LocalStorageKeys.ORDER);
-    if (storedOrder) {
-      this._newOrder.set(storedOrder);
-    }
   }
 
   calculateOrderLines(nrp: NuevoRenglonPedido[]): Observable<RenglonPedido[]> {
@@ -66,7 +63,10 @@ export class OrderService {
 
   saveOrder(np: NuevoPedido): Observable<Pedido> {
     return this.http.post<Pedido>(`${environment.apiUrl}/api/v1/pedidos`, np).pipe(
-      tap(() => this.localStorageUtil.removeItem(LocalStorageKeys.ORDER))
+      tap(() => {
+        this.localStorageUtil.removeItem(LocalStorageKeys.ORDER);
+        this._orderSaved.update(v => v + 1);
+      })
     );
   }
 }

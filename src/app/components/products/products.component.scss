@@ -26,6 +26,7 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    position: relative;
     gap: 0.5rem;
     padding: 1rem;
 
@@ -35,6 +36,7 @@
 
     .spinner {
       display: flex;
+      flex: 1 1 auto;
       align-items: center;
       justify-content: center;
     }

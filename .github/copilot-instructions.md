@@ -22,7 +22,7 @@
 
 - Components are Angular standalone components using `imports` arrays and file-based `templateUrl` / `styleUrls` metadata.
 - Service injection is handled via `inject()` in many places rather than constructor-based DI.
-- The business domain is Spanish/Argentine POS terminology (`producto`, `pedido`, `sucursal`, `cuenta corriente`, `usuario`, etc.), so naming and user-facing strings generally follow that domain language.
+- The business domain is Spanish/Argentine POS terminology (`producto`, `pedido`, `sucursal`, `cuenta corriente`, `usuario`, etc.), so model/API field names and user-facing strings generally follow that domain language. However, local variable, property, and method names in TypeScript code should be in English, not Spanish.
 - Feature work is organized by screen and service responsibility rather than by NgModules; there is no module-per-feature layout in this repo.
 - Changes that touch auth, order flows, product data, or customer branch state should be checked against both the relevant service and the matching model contract, because the frontend relies on a backend API with typed DTOs.
 - `ENV_NAME` is required by the build script; builds should be run with it set in the shell when using the project script, especially in CI and production-like configurations.
