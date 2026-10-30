@@ -34,6 +34,26 @@
             @let hasStockError = $stockErrors().has(item.idProductoItem);
             <span class="checkout-qty">{{ item.cantidad | number: '1.0-2' }}</span>
             <div class="checkout-product-details">
+              <div class="checkout-product-meta">
+                <span class="checkout-product-code">{{ item.codigoItem }}</span>
+                @if (isOffer(item) && item.cantidad >= getMinimumQuantity(item)) {
+                  <span class="checkout-discount-badge">
+                    OFERTA {{ getDiscountPercentage(item) | number: '1.0-2' }}%
+                    @if (getMinimumQuantity(item); as minimumQuantity) {
+                      @if (minimumQuantity > 1) {
+                        (llevando {{ minimumQuantity | number: '1.0-2' }} o más)
+                      }
+                    }
+                  </span>
+                } @else if (getMinimumQuantity(item); as minimumQuantity) {
+                  @if (minimumQuantity > 1 && item.cantidad >= minimumQuantity && getDiscountPercentage(item) > 0) {
+                    <span class="checkout-discount-badge">
+                      DESCUENTO {{ getDiscountPercentage(item) | number: '1.0-2' }}%
+                      (llevando {{ minimumQuantity | number: '1.0-2' }} o más)
+                    </span>
+                  }
+                }
+              </div>
               <span class="checkout-desc">{{ item.descripcionItem }}</span>
               @if ($stockErrors().get(item.idProductoItem); as stockError) {
                 <span class="stock-error" role="alert">
@@ -46,9 +66,8 @@
             <span class="checkout-price">${{ item.importe | number: '1.0-2' }}</span>
             <button matIconButton [matTooltip]="hasStockError ? 'Ajustar al stock disponible' : 'Quitar producto'" matTooltipClass="customer-search-tooltip"
                     [attr.aria-label]="hasStockError ? 'Ajustar al stock disponible' : 'Quitar producto'"
-                    (click)="hasStockError ? adjustItemToAvailableStock(item, $index) : removeItem(item, $index)" [tabIndex]="-1"
-                    #checkoutRow (keydown)="onCheckoutRowKeyDown($event, $index)"
-                    (focus)="lastFocusedCheckoutIndex = $index">
+                    (click)="hasStockError ? adjustItemToAvailableStock(item) : removeItem(item)" [tabIndex]="-1"
+                    #checkoutRow (keydown)="onCheckoutRowKeyDown($event, $index)">
               <mat-icon>{{ hasStockError ? 'refresh' : 'close' }}</mat-icon>
             </button>
           </mat-toolbar-row>

@@ -65,7 +65,6 @@ export class ProductsComponent {
   $products = signal<Producto[]>([]);
   infiniteScrollPage = 0;
   isLastPage = true;
-  lastFocusedQtyIndex = 0;
   readonly debounceTimeMs = 600;
   private debounceTimer: any;
   loggedUser!: Usuario | null;
@@ -87,7 +86,7 @@ export class ProductsComponent {
 
     effect(() => {
       if (this.focusNavigationService.$qtyInputFocusRequest() > 0) {
-        setTimeout(() => this.focusQtyInput(this.lastFocusedQtyIndex), 0);
+        setTimeout(() => this.focusQtyInput(0), 0);
       }
     });
 
@@ -209,7 +208,7 @@ export class ProductsComponent {
   onSearchKeyDown(event: KeyboardEvent) {
     if (event.key === 'Tab' && !event.shiftKey) {
       event.preventDefault();
-      this.focusQtyInput(this.lastFocusedQtyIndex);
+      this.focusQtyInput(0);
     }
   }
 
@@ -314,6 +313,7 @@ export class ProductsComponent {
   }
 
   private updateOrderWithQuantity(product: Producto, quantity: number, input: HTMLInputElement) {
+    this.orderService.setProductMetadata([product]);
     const selectedSucursal = this.branchService.$selectedSucursal();
     if (!selectedSucursal) {
       return;
@@ -383,8 +383,11 @@ export class ProductsComponent {
   }
 
   private searchProducts(term: string) {
-    const hadQtyInputFocus = document.activeElement instanceof HTMLElement
-      && document.activeElement.classList.contains('quantity-input');
+    const focusedQuantityInput = this.infiniteScrollPage > 0
+      && document.activeElement instanceof HTMLInputElement
+      && document.activeElement.classList.contains('quantity-input')
+      ? document.activeElement
+      : null;
     this.$loading.set(true);
     const selectedSucursal = this.branchService.$selectedSucursal();
     if (!selectedSucursal) {
@@ -410,18 +413,19 @@ export class ProductsComponent {
           this.isLastPage = data.last;
           if (this.infiniteScrollPage === 0) {
             setTimeout(() => this.productSearchInput.nativeElement.focus(), 0);
-          } else if (hadQtyInputFocus) {
-            setTimeout(() => this.focusQtyInput(this.lastFocusedQtyIndex), 0);
           }
           this.$loading.set(false);
+          if (focusedQuantityInput) {
+            setTimeout(() => focusedQuantityInput.focus({ preventScroll: true }), 0);
+          }
         },
         error: (err) => {
           if (this.infiniteScrollPage > 0) {
             this.infiniteScrollPage -= 1;
           }
           this.$loading.set(false);
-          if (hadQtyInputFocus) {
-            setTimeout(() => this.focusQtyInput(this.lastFocusedQtyIndex), 0);
+          if (focusedQuantityInput) {
+            setTimeout(() => focusedQuantityInput.focus({ preventScroll: true }), 0);
           }
           this.showErrorMessage(err);
         }

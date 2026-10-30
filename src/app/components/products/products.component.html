@@ -57,6 +57,12 @@
                     }
                   </span>
                 }
+                @else if (p.cantMinima > 1 && +p.porcentajeBonificacionPrecio > 0) {
+                  <span class="offer-badge">
+                    DESCUENTO {{ p.porcentajeBonificacionPrecio | number: '1.0-2' }}%
+                    (llevando {{ p.cantMinima | number: '1.0-2' }} o más)
+                  </span>
+                }
               </div>
               <div class="product-description">{{ p.descripcion }}</div>
             </div>
@@ -68,7 +74,7 @@
                 <span>${{ p.precioLista | number: '1.0-2' }}</span>
               }
             </div>
-            <div class="product-stock"> {{ getAvailableQuantityForSelectedBranch(p) }} {{ p.nombreMedida }}</div>
+            <div class="product-stock"> {{ getAvailableQuantityForSelectedBranch(p) | number: '1.0-2' }} {{ p.nombreMedida }}</div>
             <div class="product-quantity">
               <button mat-icon-button [matTooltip]="stockError ? 'Ajustar al stock disponible' : 'Disminuir cantidad'" matTooltipClass="customer-search-tooltip"
                       [attr.aria-label]="stockError ? 'Ajustar al stock disponible' : 'Disminuir cantidad'" (click)="decreaseQuantity(p, qtyInput)" tabindex="-1" [disabled]="$loading() || orderService.$updatingOrder()">
@@ -80,7 +86,6 @@
                        [value]="getQuantityDisplayValue(p)"
                        (input)="onQuantityChange(p, $event)"
                        (blur)="formatQuantity($event)"
-                       (focus)="lastFocusedQtyIndex = $index"
                        (keydown)="onQuantityKeyDown($event, $index)"
                        [disabled]="$loading() || orderService.$updatingOrder()"
                        tabindex="-1"

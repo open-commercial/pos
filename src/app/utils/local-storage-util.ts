@@ -4,7 +4,8 @@ import crypto from 'crypto-js';
 export enum LocalStorageKeys {
   TOKEN = 'token',
   ORDER = 'order',
-  CUSTOMER_ACCOUNT = 'customer_account'
+  CUSTOMER_ACCOUNT = 'customer_account',
+  PRODUCT_METADATA = 'product_metadata'
 }
 
 @Service()

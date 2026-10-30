@@ -65,7 +65,6 @@ export class CheckoutComponent implements AfterViewInit {
   $orderLines = signal<RenglonPedido[]>([]);
   readonly $stockErrors = this.orderService.$stockErrors;
   $loading = signal(false);
-  lastFocusedCheckoutIndex = 0;
   private pendingRemoveFocus = false;
   private confirmationDialogOpen = false;
   @ViewChild('orderConfirmation') orderConfirmation!: TemplateRef<unknown>;
@@ -95,7 +94,7 @@ export class CheckoutComponent implements AfterViewInit {
 
     effect(() => {
       if (this.focusNavigationService.$checkoutRowFocusRequest() > 0) {
-        setTimeout(() => this.focusCheckoutRow(this.lastFocusedCheckoutIndex), 0);
+        setTimeout(() => this.focusCheckoutRow(0), 0);
       }
     });
 
@@ -111,7 +110,7 @@ export class CheckoutComponent implements AfterViewInit {
       this.pendingRemoveFocus = false;
       const rows = this.checkoutRows.toArray();
       if (rows.length > 0) {
-        setTimeout(() => this.focusCheckoutRow(this.lastFocusedCheckoutIndex), 0);
+        setTimeout(() => this.focusCheckoutRow(0), 0);
       } else {
         this.focusNavigationService.requestQtyInputFocus();
       }
@@ -164,7 +163,7 @@ export class CheckoutComponent implements AfterViewInit {
       event.preventDefault();
       const rows = this.checkoutRows.toArray();
       if (rows.length > 0) {
-        this.focusCheckoutRow(this.lastFocusedCheckoutIndex);
+        this.focusCheckoutRow(0);
       } else {
         this.focusNavigationService.requestQtyInputFocus();
       }
@@ -221,21 +220,38 @@ export class CheckoutComponent implements AfterViewInit {
     return this.$orderLines().reduce((sum, item) => sum + item.importe, 0);
   }
 
-  removeItem(item: RenglonPedido, index: number) {
+  getMinimumQuantity(item: RenglonPedido) {
+    return Math.max(
+      item.cantMinima ?? 0,
+      this.orderService.productMetadata().get(item.idProductoItem)?.cantMinima ?? 0
+    );
+  }
+
+  isOffer(item: RenglonPedido) {
+    return item.oferta || this.orderService.productMetadata().get(item.idProductoItem)?.oferta === true;
+  }
+
+  getDiscountPercentage(item: RenglonPedido) {
+    const metadata = this.orderService.productMetadata().get(item.idProductoItem);
+    const discount = this.isOffer(item)
+      ? metadata?.porcentajeBonificacionOferta ?? item.bonificacionPorcentaje
+      : metadata?.porcentajeBonificacionPrecio ?? item.bonificacionPorcentaje;
+    return Number(discount);
+  }
+
+  removeItem(item: RenglonPedido) {
     this.pendingRemoveFocus = true;
-    this.lastFocusedCheckoutIndex = index;
     const renglones = (this.orderService.$newOrder().renglones ?? [])
       .filter(r => r.idProductoItem !== item.idProductoItem);
     this.orderService.setOrderLines(renglones);
     this.notificationService.openSnackBar(`❌ Se quitó "${item.descripcionItem}" de la lista`, '', 3000);
   }
 
-  adjustItemToAvailableStock(item: RenglonPedido, index: number) {
+  adjustItemToAvailableStock(item: RenglonPedido) {
     const stockError = this.$stockErrors().get(item.idProductoItem);
     if (!stockError) return;
 
     this.pendingRemoveFocus = true;
-    this.lastFocusedCheckoutIndex = index;
     const quantity = Math.max(0, Math.min(item.cantidad, stockError.cantidadDisponible));
     const lines = (this.orderService.$newOrder().renglones ?? [])
       .map(line => line.idProductoItem === item.idProductoItem ? { ...line, cantidad: quantity } : line)

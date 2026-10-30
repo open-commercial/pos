@@ -6,6 +6,7 @@ export interface RenglonPedido {
   medidaItem: string;
   urlImagenItem: string;
   oferta: boolean;
+  cantMinima?: number;
   precioUnitario: number;
   cantidad: number;
   bonificacionPorcentaje: number;

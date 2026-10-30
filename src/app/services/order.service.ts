@@ -22,6 +22,10 @@ export class OrderService {
 
   http = inject(HttpClient);
   localStorageUtil = inject(LocalStorageUtil);
+  private readonly $productMetadata = signal(new Map<number, Pick<Producto, 'cantMinima' | 'oferta' | 'porcentajeBonificacionOferta' | 'porcentajeBonificacionPrecio'>>(
+    this.localStorageUtil.getItem(LocalStorageKeys.PRODUCT_METADATA) ?? []
+  ));
+  readonly productMetadata = this.$productMetadata.asReadonly();
   private readonly _newOrder = signal<Partial<NuevoPedido>>(
     this.localStorageUtil.getItem(LocalStorageKeys.ORDER) ?? {}
   );
@@ -33,6 +37,22 @@ export class OrderService {
 
   setUpdatingOrder(value: boolean) {
     this._updatingOrder.set(value);
+  }
+
+  setProductMetadata(products: Producto[]) {
+    this.$productMetadata.update(current => {
+      const updated = new Map(current);
+      for (const product of products) {
+        updated.set(product.idProducto, {
+          cantMinima: product.cantMinima,
+          oferta: product.oferta,
+          porcentajeBonificacionOferta: product.porcentajeBonificacionOferta,
+          porcentajeBonificacionPrecio: product.porcentajeBonificacionPrecio
+        });
+      }
+      this.localStorageUtil.setItem(LocalStorageKeys.PRODUCT_METADATA, [...updated.entries()]);
+      return updated;
+    });
   }
 
   calculateOrderLines(nrp: NuevoRenglonPedido[]): Observable<RenglonPedido[]> {
@@ -47,6 +67,12 @@ export class OrderService {
     const updatedOrder: Partial<NuevoPedido> = { ...this._newOrder(), renglones: orderLines };
     this._newOrder.set(updatedOrder);
     this.localStorageUtil.setItem(LocalStorageKeys.ORDER, updatedOrder);
+    const productIds = new Set(orderLines.map(line => line.idProductoItem));
+    this.$productMetadata.update(current => {
+      const updated = new Map([...current].filter(([id]) => productIds.has(id)));
+      this.localStorageUtil.setItem(LocalStorageKeys.PRODUCT_METADATA, [...updated.entries()]);
+      return updated;
+    });
   }
 
   addOrderLine(p: Producto) {
