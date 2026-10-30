@@ -4,6 +4,7 @@ import { BranchService } from 'src/app/services/branch.service';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { AuthService, SERVICE_UNAVAILABLE_MESSAGE } from 'src/app/services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -16,7 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { SearchBranchDialogComponent } from '../search-branch-dialog/search-branch-dialog.component';
 import { NotificationService } from 'src/app/services/notification.service';
 import { Router } from '@angular/router';
-import { map, switchMap, throwError } from 'rxjs';
+import { finalize, map, switchMap, throwError } from 'rxjs';
 import { Usuario } from 'src/app/models/usuario.model';
 import { Producto } from 'src/app/models/producto.model';
 import { CantidadEnSucursal } from "src/app/models/cantidad-en-sucursal.model";
@@ -42,6 +43,7 @@ import { RenglonPedido } from '../../models/renglon-pedido.model';
     FormsModule,
     MatButtonModule,
     MatIconModule,
+    MatTooltipModule,
     MatCardModule,
     MatMenuModule,
     MatRippleModule,
@@ -64,13 +66,18 @@ export class ProductsComponent {
   infiniteScrollPage = 0;
   isLastPage = true;
   lastFocusedQtyIndex = 0;
-  readonly debounceTimeMs = 500;
+  readonly debounceTimeMs = 600;
   private debounceTimer: any;
   loggedUser!: Usuario | null;
   @ViewChild('productSearchInput') productSearchInput!: ElementRef<HTMLInputElement>;
   @ViewChildren('qtyInput') qtyInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
   constructor() {
+    effect(() => {
+      this.branchService.$selectedSucursal();
+      this.orderService.$stockErrors.set(new Map());
+    });
+
     effect(() => {
       const term = this.$searchCriteria().trim();
       this.infiniteScrollPage = 0;
@@ -81,6 +88,15 @@ export class ProductsComponent {
     effect(() => {
       if (this.focusNavigationService.$qtyInputFocusRequest() > 0) {
         setTimeout(() => this.focusQtyInput(this.lastFocusedQtyIndex), 0);
+      }
+    });
+
+    effect(() => {
+      if (this.focusNavigationService.$searchInputFocusRequest() > 0) {
+        setTimeout(() => {
+          this.productSearchInput.nativeElement.focus();
+          this.productSearchInput.nativeElement.select();
+        }, 0);
       }
     });
 
@@ -121,80 +137,65 @@ export class ProductsComponent {
 
   formatQuantity(event: Event) {
     const input = event.target as HTMLInputElement;
-    let value = input.value.trim();
-
-    // Normalize comma to dot
-    if (value.includes(',')) {
-      value = value.replaceAll(',', '.');
-    }
-
-    // If value ends with a decimal separator (dot) remove it
-    if (value.endsWith('.')) {
-      value = value.slice(0, -1);
-    }
-
-    // Remove leading zeros from integer part
-    if (value.includes('.')) {
-      const parts = value.split('.');
-      const intPart = parts[0].replace(/^0+/, '');
-      const decPart = parts[1] || '';
-      if (/^0*$/.test(decPart)) {
-        // decimal part is all zeros -> collapse
-        value = intPart === '' ? '0' : intPart;
-      } else {
-        // remove leading zeros from integer part but keep decimal
-        parts[0] = intPart === '' ? '0' : intPart;
-        value = parts.join('.');
-      }
-    } else {
-      // no decimal part: remove leading zeros, but leave single zero
-      value = value.replace(/^0+/, '');
-      if (value === '') value = '0';
-    }
-
-    input.value = value;
+    const quantity = this.parseQuantity(input.value);
+    input.value = this.toDisplayQuantity(Math.round(quantity * 100) / 100);
   }
 
   onQuantityChange(product: Producto, event: Event) {
     const input = event.target as HTMLInputElement;
-    let value = input.value;
+    let value = input.value.replace('.', ',').replace(/[^\d,]/g, '');
+
+    const [integerPart, ...decimalParts] = value.split(',');
+    value = decimalParts.length
+      ? `${integerPart},${decimalParts.join('').slice(0, 2)}`
+      : integerPart;
+
+    input.value = value;
 
     // If empty, reset to 0
     if (value === '') {
       input.value = '0';
+      this.updateOrderWithQuantity(product, 0, input);
       return;
     }
 
-    // Limit to 2 decimal places (but allow typing the dot)
-    const dotIndex = value.indexOf('.');
-    if (dotIndex !== -1 && value.length > dotIndex + 3) {
-      value = value.substring(0, dotIndex + 3);
-      input.value = value;
-    }
-
-    // Only validate if not ending with a dot (user is still typing decimal)
-    if (value.endsWith('.')) {
+    // Only validate if not ending with a comma (user is still typing decimal)
+    if (value.endsWith(',')) {
       return;
     }
-
-    let quantity = Number.parseFloat(value) || 0;
 
     // Round to max 2 decimals
-    quantity = Math.round(quantity * 100) / 100;
+    let quantity = Math.round(this.parseQuantity(value) * 100) / 100;
 
     const availableQuantity = this.getAvailableQuantityForSelectedBranch(product);
 
     // Check if exceeds available quantity
     if (quantity > availableQuantity) {
       quantity = availableQuantity;
-      input.value = availableQuantity.toString();
+      input.value = this.toDisplayQuantity(availableQuantity);
     }
 
     this.updateOrderWithQuantity(product, quantity, input);
   }
 
+  getQuantityDisplayValue(p: Producto) {
+    return this.toDisplayQuantity(this.getProductQuantityInOrder(p));
+  }
+
+  private parseQuantity(value: string) {
+    return Number.parseFloat(value.trim().replace(',', '.')) || 0;
+  }
+
+  private toDisplayQuantity(quantity: number) {
+    return quantity.toString().replace('.', ',');
+  }
+
   getAvailableQuantityForSelectedBranch(p: Producto) {
     const selectedSucursal = this.branchService.$selectedSucursal();
+    const stockError = this.orderService.$stockErrors().get(p.idProducto);
+    if (stockError && stockError.idSucursal === selectedSucursal?.idSucursal) {
+      return stockError.cantidadDisponible;
+    }
     const aux: Array<CantidadEnSucursal> = p.cantidadEnSucursales.filter(c => c.idSucursal === selectedSucursal?.idSucursal);
     return aux.length ? aux[0].cantidad : 0;
   }
@@ -245,25 +246,31 @@ export class ProductsComponent {
   increaseQuantity(p: Producto, input: HTMLInputElement) {
     const current = this.getProductQuantityInOrder(p);
     const available = this.getAvailableQuantityForSelectedBranch(p);
+    if (current > available) return;
     const next = Math.min(current + 1, available);
     if (next === current) return;
-    input.value = next.toString();
+    input.value = this.toDisplayQuantity(next);
     this.updateOrderWithQuantity(p, next, input);
   }
 
   decreaseQuantity(p: Producto, input: HTMLInputElement) {
     const current = this.getProductQuantityInOrder(p);
-    const next = Math.max(current - 1, 0);
+    const available = this.getAvailableQuantityForSelectedBranch(p);
+    const next = Math.max(current > available ? available : current - 1, 0);
     if (next === current) return;
-    input.value = next.toString();
+    input.value = this.toDisplayQuantity(next);
     this.updateOrderWithQuantity(p, next, input);
   }
 
   openSearchBranchDialog() {
-    const dialogRef = this.dialog.open(SearchBranchDialogComponent, { restoreFocus: false });
+    const dialogRef = this.dialog.open(SearchBranchDialogComponent, {
+      restoreFocus: false,
+      width: '640px',
+      maxWidth: 'calc(100vw - 32px)'
+    });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.notificationService.openSnackBar("Sucursal seleccionada: " + result, '', 3500);
+        this.notificationService.openSnackBar("✅ Sucursal seleccionada: " + result, '', 3500);
         this.infiniteScrollPage = 0;
         this.searchProducts(this.$searchCriteria());
       }
@@ -319,10 +326,16 @@ export class ProductsComponent {
       renglones.push({ idProductoItem: product.idProducto, cantidad: quantity });
     }
 
+    if (renglones.length === 0) {
+      this.orderService.setOrderLines(renglones);
+      setTimeout(() => input.focus(), 0);
+      return;
+    }
+
     const stockPayload: ProductosParaVerificarStock = {
       idSucursal: selectedSucursal.idSucursal,
-      idProducto: renglones.map(r => r.idProductoItem),
-      cantidad: renglones.map(r => r.cantidad)
+      idProducto: [product.idProducto],
+      cantidad: [quantity]
     };
 
     this.orderService.setUpdatingOrder(true);
@@ -355,11 +368,13 @@ export class ProductsComponent {
         },
         error: (err) => {
           this.orderService.setUpdatingOrder(false);
-          input.value = this.getProductQuantityInOrder(product).toString();
+          input.value = this.toDisplayQuantity(this.getProductQuantityInOrder(product));
           setTimeout(() => input.focus(), 0);
           if (err?.faltantes) {
             const descripciones = err.faltantes.map((f: ProductoFaltante) => f.descripcion).join(', ');
-            this.notificationService.openSnackBar(`Sin stock disponible: ${descripciones}`, '', 3500);
+            this.notificationService.openSnackBar(`❌ Sin stock disponible: ${descripciones}`, '', 3500);
+            this.infiniteScrollPage = 0;
+            this.searchProducts(this.$searchCriteria());
           } else {
             this.showErrorMessage(err);
           }
@@ -387,6 +402,7 @@ export class ProductsComponent {
     if (this.infiniteScrollPage === 0) {
       this.$products.set([]);
     }
+    this.checkCheckoutStock(selectedSucursal.idSucursal);
     this.productService.search(criteria, selectedSucursal.idSucursal)
       .subscribe({
         next: (data) => {
@@ -410,6 +426,35 @@ export class ProductsComponent {
           this.showErrorMessage(err);
         }
       });
+  }
+
+  private checkCheckoutStock(branchId: number) {
+    const lines = this.orderService.$newOrder().renglones ?? [];
+    if (lines.length === 0) {
+      this.orderService.$stockErrors.set(new Map());
+      return;
+    }
+
+    this.orderService.$pendingStockChecks.update(count => count + 1);
+    this.productService.checkStockAvailability({
+      idSucursal: branchId,
+      idProducto: lines.map(line => line.idProductoItem),
+      cantidad: lines.map(line => line.cantidad)
+    }).pipe(
+      finalize(() => this.orderService.$pendingStockChecks.update(count => count - 1))
+    ).subscribe({
+      next: items => {
+        if (this.branchService.$selectedSucursal()?.idSucursal !== branchId
+          || this.orderService.$newOrder().renglones !== lines) {
+          return;
+        }
+        const branchErrors = items.filter(item => item.idSucursal === branchId);
+        this.orderService.$stockErrors.set(new Map(branchErrors.map(item => [item.idProducto, item])));
+      },
+      error: () => {
+        this.notificationService.openSnackBar('❌ No se pudo verificar el stock. Intente nuevamente', '', 5000);
+      }
+    });
   }
 
   private addOrRemoveProductToOrder(p: Producto) {

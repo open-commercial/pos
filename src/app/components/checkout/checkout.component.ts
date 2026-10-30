@@ -1,13 +1,14 @@
-import { Component, effect, ElementRef, inject, QueryList, signal, ViewChild, ViewChildren, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, effect, ElementRef, inject, QueryList, signal, TemplateRef, ViewChild, ViewChildren, AfterViewInit, ChangeDetectionStrategy } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatListModule } from '@angular/material/list';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelect, MatSelectModule } from '@angular/material/select';
 import { NotificationService } from 'src/app/services/notification.service';
 import { SearchCustomerDialogComponent } from '../search-customer-dialog/search-customer-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DecimalPipe } from '@angular/common';
 import { OrderService } from '../../services/order.service';
 import { CustomerAccountService } from '../../services/customer-account.service';
@@ -22,6 +23,8 @@ import { TipoDeEnvio } from '../../models/tipo-de-envio';
 import { PaymentMethodService } from '../../services/payment-method.service';
 import { FormaDePago } from '../../models/forma-de-pago.model';
 import { TipoDeComprobante } from '../../models/tipo-de-comprobante';
+import { ProductService } from '../../services/product.service';
+import { catchError, EMPTY, finalize, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-checkout',
@@ -32,10 +35,12 @@ import { TipoDeComprobante } from '../../models/tipo-de-comprobante';
     MatIconModule,
     MatButtonModule,
     MatToolbarModule,
+    MatTooltipModule,
     MatListModule,
     MatProgressSpinnerModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatDialogModule,
     DecimalPipe
   ]
 })
@@ -48,6 +53,7 @@ export class CheckoutComponent implements AfterViewInit {
 
   notificationService = inject(NotificationService);
   orderService = inject(OrderService);
+  productService = inject(ProductService);
   customerAccountService = inject(CustomerAccountService);
   branchService = inject(BranchService);
   focusNavigationService = inject(FocusNavigationService);
@@ -57,23 +63,31 @@ export class CheckoutComponent implements AfterViewInit {
   $customerName = signal('');
   $customerError = signal(false);
   $orderLines = signal<RenglonPedido[]>([]);
+  readonly $stockErrors = this.orderService.$stockErrors;
   $loading = signal(false);
   lastFocusedCheckoutIndex = 0;
   private pendingRemoveFocus = false;
+  private confirmationDialogOpen = false;
+  @ViewChild('orderConfirmation') orderConfirmation!: TemplateRef<unknown>;
   @ViewChildren('checkoutRow', { read: ElementRef }) checkoutRows!: QueryList<ElementRef<HTMLElement>>;
-  @ViewChild('checkoutBtn', { read: ElementRef }) checkoutBtn!: ElementRef<HTMLElement>;
+  @ViewChild('checkoutBtn', { read: ElementRef }) checkoutBtn!: ElementRef<HTMLButtonElement>;
   @ViewChild('receiptTypeSelect') receiptTypeSelect!: MatSelect;
   @ViewChild('paymentMethodSelect') paymentMethodSelect!: MatSelect;
 
   constructor() {
     effect(() => {
       const renglones = this.orderService.$newOrder().renglones ?? [];
+      this.$stockErrors.set(new Map());
       if (renglones.length === 0) {
         this.$orderLines.set([]);
+        this.$loading.set(false);
+        this.orderService.$refreshingCheckoutItem.set(false);
         return;
       }
       this.$loading.set(true);
-      this.orderService.calculateOrderLines(renglones).subscribe({
+      this.orderService.calculateOrderLines(renglones).pipe(
+        finalize(() => this.orderService.$refreshingCheckoutItem.set(false))
+      ).subscribe({
         next: (lines) => { this.$orderLines.set(lines); this.$loading.set(false); },
         error: () => { this.$orderLines.set([]); this.$loading.set(false); }
       });
@@ -107,7 +121,7 @@ export class CheckoutComponent implements AfterViewInit {
   focusCheckoutRow(index: number) {
     const rows = this.checkoutRows?.toArray() ?? [];
     if (rows.length === 0) {
-      this.checkoutBtn?.nativeElement.focus();
+      this.receiptTypeSelect?.focus();
       return;
     }
     rows[Math.min(index, rows.length - 1)]?.nativeElement.focus();
@@ -131,15 +145,14 @@ export class CheckoutComponent implements AfterViewInit {
   onPaymentMethodKeyDown(event: KeyboardEvent) {
     if (event.key === 'Tab' && !event.shiftKey) {
       event.preventDefault();
-      this.checkoutBtn?.nativeElement.focus();
+      if (this.checkoutBtn.nativeElement.disabled) {
+        this.focusNavigationService.requestSearchInputFocus();
+      } else {
+        this.checkoutBtn.nativeElement.focus();
+      }
     } else if (event.key === 'Tab' && event.shiftKey) {
       event.preventDefault();
-      const rows = this.checkoutRows.toArray();
-      if (rows.length > 0) {
-        this.focusCheckoutRow(this.lastFocusedCheckoutIndex);
-      } else {
-        this.focusNavigationService.requestQtyInputFocus();
-      }
+      this.receiptTypeSelect?.focus();
     }
   }
 
@@ -161,7 +174,7 @@ export class CheckoutComponent implements AfterViewInit {
   onCheckoutBtnKeyDown(event: KeyboardEvent) {
     if (event.key === 'Tab' && event.shiftKey) {
       event.preventDefault();
-      this.receiptTypeSelect?.focus();
+      this.paymentMethodSelect?.focus();
     }
   }
 
@@ -217,8 +230,23 @@ export class CheckoutComponent implements AfterViewInit {
     this.notificationService.openSnackBar(`❌ Se quitó "${item.descripcionItem}" de la lista`, '', 3000);
   }
 
+  adjustItemToAvailableStock(item: RenglonPedido, index: number) {
+    const stockError = this.$stockErrors().get(item.idProductoItem);
+    if (!stockError) return;
+
+    this.pendingRemoveFocus = true;
+    this.lastFocusedCheckoutIndex = index;
+    const quantity = Math.max(0, Math.min(item.cantidad, stockError.cantidadDisponible));
+    const lines = (this.orderService.$newOrder().renglones ?? [])
+      .map(line => line.idProductoItem === item.idProductoItem ? { ...line, cantidad: quantity } : line)
+      .filter(line => line.cantidad > 0);
+    this.$loading.set(true);
+    this.orderService.$refreshingCheckoutItem.set(true);
+    this.orderService.setOrderLines(lines);
+  }
+
   sendOrder() {
-    if (this.$orderLines().length === 0 || this.$loading() || this.orderService.$updatingOrder()) {
+    if (this.$orderLines().length === 0 || this.$loading() || this.orderService.$updatingOrder() || this.confirmationDialogOpen) {
       return;
     }
 
@@ -250,24 +278,77 @@ export class CheckoutComponent implements AfterViewInit {
       descuentoPorcentaje: currentOrder.descuentoPorcentaje ?? 0
     };
 
+    this.confirmationDialogOpen = true;
+    const dialogRef = this.dialog.open<unknown, {
+      customerName: string;
+      branchName: string;
+      receiptType: TipoDeComprobante;
+      paymentMethod: string;
+      total: number;
+    }, boolean>(
+      this.orderConfirmation,
+      {
+        width: '640px',
+        maxWidth: 'calc(100vw - 32px)',
+        autoFocus: '.confirm-order-button',
+        ariaLabel: 'Confirmación del pedido',
+        data: {
+          customerName: this.$customerName(),
+          branchName: selectedSucursal.nombre,
+          receiptType: this.$selectedReceiptType(),
+          paymentMethod: selectedPaymentMethod.nombre,
+          total: nuevoPedido.montos[0]
+        }
+      }
+    );
+    dialogRef.afterClosed().subscribe(confirmed => {
+      this.confirmationDialogOpen = false;
+      if (confirmed === true) {
+        this.saveOrder(nuevoPedido);
+      }
+    });
+  }
+
+  private saveOrder(nuevoPedido: NuevoPedido) {
+    this.$stockErrors.set(new Map());
     this.orderService.setUpdatingOrder(true);
-    this.orderService.saveOrder(nuevoPedido).subscribe({
+    this.productService.checkStockAvailability({
+      idSucursal: nuevoPedido.idSucursal,
+      idProducto: nuevoPedido.renglones.map(line => line.idProductoItem),
+      cantidad: nuevoPedido.renglones.map(line => line.cantidad)
+    }).pipe(
+      catchError(() => {
+        this.notificationService.openSnackBar('❌ No se pudo verificar el stock. Intente nuevamente', '', 5000);
+        return EMPTY;
+      }),
+      switchMap(outOfStockItems => {
+        const branchStockErrors = outOfStockItems.filter(item => item.idSucursal === nuevoPedido.idSucursal);
+        if (branchStockErrors.length > 0) {
+          this.$stockErrors.set(new Map(branchStockErrors.map(item => [item.idProducto, item])));
+          this.notificationService.openSnackBar('❌ Uno o mas productos no tienen stock disponible. Verifique la lista de productos', '', 5000);
+          return EMPTY;
+        }
+        return this.orderService.saveOrder(nuevoPedido);
+      }),
+      finalize(() => this.orderService.setUpdatingOrder(false))
+    ).subscribe({
       next: () => {
-        this.orderService.setUpdatingOrder(false);
         this.orderService.setOrderLines([]);
         this.selectDefaultPaymentMethod();
         this.$selectedReceiptType.set(TipoDeComprobante.TIQUE_PRESUPUESTO);
-        this.notificationService.openSnackBar('✅ Pedido guardado!', '', 5000);
       },
       error: () => {
-        this.orderService.setUpdatingOrder(false);
         this.notificationService.openSnackBar('❌ No se pudo guardar el pedido. Intente nuevamente', '', 5000);
       }
     });
   }
 
   openSearchCustomerDialog() {
-    const dialogRef = this.dialog.open(SearchCustomerDialogComponent, { restoreFocus: false });
+    const dialogRef = this.dialog.open(SearchCustomerDialogComponent, {
+      restoreFocus: false,
+      width: '640px',
+      maxWidth: 'calc(100vw - 32px)'
+    });
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.$customerName.set(result);

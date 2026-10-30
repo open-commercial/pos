@@ -1,3 +1,79 @@
+.order-confirmation {
+  padding: 0 0 1rem;
+  background: var(--mat-sys-surface-container);
+
+  mat-dialog-content {
+    padding: 1.5rem;
+    font-size: 1.25rem;
+    line-height: 1.5;
+  }
+
+  p {
+    margin-top: 0;
+    text-align: center;
+  }
+
+  .confirmation-summary {
+    margin: 0;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background: var(--mat-sys-surface);
+
+    > div {
+      display: flex;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+
+      + div {
+        margin-top: 1.5rem;
+      }
+    }
+
+    dd {
+      margin: 0;
+      text-align: right;
+      overflow-wrap: anywhere;
+      font-weight: 600;
+    }
+
+    .confirmation-customer {
+      flex-wrap: nowrap;
+
+      dt {
+        flex-shrink: 0;
+      }
+
+      dd {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .confirmation-total {
+      border-top: 1px solid var(--mat-sys-outline-variant);
+      padding-top: 1.5rem;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--mat-sys-primary);
+    }
+  }
+
+  mat-dialog-actions {
+    gap: 1rem;
+    padding: 1.5rem;
+
+    button {
+      flex: 1 1 12rem;
+      min-height: 4rem;
+      padding: 1rem 1.5rem;
+      font-size: 1.25rem;
+    }
+  }
+}
+
 .checkout-container {
   display: flex;
   flex-direction: column;
@@ -81,6 +157,31 @@
     .checkout-item {
       flex: 0 0 auto;
 
+      &.checkout-item-stock-error {
+        height: auto;
+        min-height: 4rem;
+        padding-block: 0.5rem;
+
+        .checkout-qty,
+        .checkout-desc,
+        .checkout-price {
+          color: var(--mat-sys-error);
+        }
+      }
+
+      .checkout-product-details {
+        min-width: 0;
+        padding: 0 1rem;
+      }
+
+      .stock-error {
+        display: block;
+        color: var(--mat-sys-error);
+        font-size: 1rem;
+        line-height: 1.4;
+        white-space: normal;
+      }
+
       button:focus {
         mat-icon {
           color: var(--mdc-theme-primary, #3f51b5);
@@ -100,7 +201,6 @@
         overflow: hidden;
         font-size: 1.2rem;
         text-wrap: auto;
-        padding: 0 1rem;
       }
 
       .spacer {

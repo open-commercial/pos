@@ -1,3 +1,26 @@
+mat-dialog-content {
+  padding: 1.5rem;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+mat-list-option {
+  min-height: 4rem;
+  --mat-list-list-item-label-text-size: 1.25rem;
+}
+
+mat-dialog-actions {
+  gap: 1rem;
+  padding: 1.5rem;
+
+  button {
+    flex: 1 1 12rem;
+    min-height: 4rem;
+    padding: 1rem 1.5rem;
+    font-size: 1.25rem;
+  }
+}
+
 .spinner {
   display: flex;
   flex: 1 1 0;

@@ -12,13 +12,13 @@
       <span class="customer-name"><b>{{ $customerName() }}</b></span>
     }
     <span class="spacer"></span>
-    <button matIconButton (click)="openSearchCustomerDialog()">
+    <button matIconButton matTooltip="Buscar cliente" matTooltipClass="customer-search-tooltip" aria-label="Buscar cliente" (click)="openSearchCustomerDialog()">
       <mat-icon>person_search</mat-icon>
     </button>
   </mat-toolbar>
 
   <div class="checkout-list">
-    @if ($loading() || orderService.$updatingOrder()) {
+    @if ($loading() || orderService.$updatingOrder() || orderService.$pendingStockChecks() > 0) {
       <div class="spinner-container">
         <mat-spinner diameter="40" />
       </div>
@@ -30,15 +30,26 @@
     } @else {
       <mat-toolbar>
         @for (item of $orderLines(); track item.idProductoItem) {
-          <mat-toolbar-row class="checkout-item">
-            <span class="checkout-qty">{{ item.cantidad }}x</span>
-            <span class="checkout-desc">{{ item.descripcionItem }}</span>
+          <mat-toolbar-row class="checkout-item" [class.checkout-item-stock-error]="$stockErrors().has(item.idProductoItem)">
+            @let hasStockError = $stockErrors().has(item.idProductoItem);
+            <span class="checkout-qty">{{ item.cantidad | number: '1.0-2' }}</span>
+            <div class="checkout-product-details">
+              <span class="checkout-desc">{{ item.descripcionItem }}</span>
+              @if ($stockErrors().get(item.idProductoItem); as stockError) {
+                <span class="stock-error" role="alert">
+                  Stock insuficiente: Disponible: {{ stockError.cantidadDisponible | number: '1.0-2' }},
+                  Solicitado: {{ stockError.cantidadSolicitada | number: '1.0-2' }}
+                </span>
+              }
+            </div>
             <span class="spacer"></span>
             <span class="checkout-price">${{ item.importe | number: '1.0-2' }}</span>
-            <button matIconButton (click)="removeItem(item, $index)" [tabIndex]="-1"
+            <button matIconButton [matTooltip]="hasStockError ? 'Ajustar al stock disponible' : 'Quitar producto'" matTooltipClass="customer-search-tooltip"
+                    [attr.aria-label]="hasStockError ? 'Ajustar al stock disponible' : 'Quitar producto'"
+                    (click)="hasStockError ? adjustItemToAvailableStock(item, $index) : removeItem(item, $index)" [tabIndex]="-1"
                     #checkoutRow (keydown)="onCheckoutRowKeyDown($event, $index)"
                     (focus)="lastFocusedCheckoutIndex = $index">
-              <mat-icon>close</mat-icon>
+              <mat-icon>{{ hasStockError ? 'refresh' : 'close' }}</mat-icon>
             </button>
           </mat-toolbar-row>
         }
@@ -80,8 +91,43 @@
     </div>
     <button matButton="filled" class="checkout-btn" #checkoutBtn (click)="sendOrder()" (keydown)="onCheckoutBtnKeyDown($event)"
             [class.checkout-btn-disabled]="$orderLines().length === 0"
-            [disabled]="$loading() || orderService.$updatingOrder()">
+            [disabled]="$orderLines().length === 0 || $loading() || orderService.$updatingOrder()">
       <span>Finalizar</span>
     </button>
   </div>
 </div>
+
+<ng-template #orderConfirmation let-data>
+  <div class="order-confirmation">
+    <mat-dialog-content>
+      <dl class="confirmation-summary">
+        <div class="confirmation-customer">
+          <dt>Cliente</dt>
+          <dd [title]="data.customerName">{{ data.customerName }}</dd>
+        </div>
+        <div>
+          <dt>Sucursal</dt>
+          <dd>{{ data.branchName }}</dd>
+        </div>
+        <div>
+          <dt>Tipo de comprobante</dt>
+          <dd>{{ data.receiptType }}</dd>
+        </div>
+        <div>
+          <dt>Forma de pago</dt>
+          <dd>{{ data.paymentMethod }}</dd>
+        </div>
+        <div class="confirmation-total">
+          <dt>Total</dt>
+          <dd>${{ data.total | number: '1.0-2' }}</dd>
+        </div>
+      </dl>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button matButton class="cancel-order-button" [mat-dialog-close]="false">Volver</button>
+      <button matButton="filled" class="confirm-order-button" [mat-dialog-close]="true">
+        Confirmar
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>

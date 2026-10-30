@@ -24,7 +24,8 @@
              (keydown)="onSearchKeyDown($event)"
              #productSearchInput [disabled]="$loading()"/>
       @if ($searchCriteria()) {
-        <button matSuffix mat-icon-button aria-label="Clear" (click)="clearSearch()" tabindex="-1"
+        <button matSuffix mat-icon-button matTooltip="Limpiar búsqueda" matTooltipClass="customer-search-tooltip"
+                aria-label="Limpiar búsqueda" (click)="clearSearch()" tabindex="-1"
                 [disabled]="$loading()">
           <mat-icon>close</mat-icon>
         </button>
@@ -35,26 +36,48 @@
 
   <div class="products-list-container" (scroll)="onProductsScroll($event)">
     @for (p of $products(); track p) {
-      <mat-card appearance="outlined" class="product-card">
+      @let stockError = orderService.$stockErrors().has(p.idProducto)
+        || getProductQuantityInOrder(p) > getAvailableQuantityForSelectedBranch(p);
+      <mat-card appearance="outlined" class="product-card"
+                [class.product-in-checkout]="getProductQuantityInOrder(p) > 0"
+                [class.product-stock-error]="stockError">
         <mat-card-content>
           <div class="product-content">
             <div class="product-image">
               <img mat-card-image [src]="p.urlImagen ? p.urlImagen : 'assets/sin_imagen.png'" alt="Foto">
             </div>
             <div class="product-info">
-              <div class="product-code">{{ p.codigo }}</div>
+              <div class="product-code">
+                <span>{{ p.codigo }}</span>
+                @if (p.oferta) {
+                  <span class="offer-badge">
+                    OFERTA {{ p.porcentajeBonificacionOferta | number: '1.0-2' }}%
+                    @if (p.cantMinima > 1) {
+                      (llevando {{ p.cantMinima | number: '1.0-2' }} o más)
+                    }
+                  </span>
+                }
+              </div>
               <div class="product-description">{{ p.descripcion }}</div>
             </div>
-            <div class="product-price">${{ p.precioLista | number: '1.0-2' }}</div>
+            <div class="product-price">
+              @if (p.oferta && p.precioBonificado != null) {
+                <del class="original-price" aria-label="Precio original">${{ p.precioLista | number: '1.0-2' }}</del>
+                <span aria-label="Precio de oferta">${{ p.precioBonificado | number: '1.0-2' }}</span>
+              } @else {
+                <span>${{ p.precioLista | number: '1.0-2' }}</span>
+              }
+            </div>
             <div class="product-stock"> {{ getAvailableQuantityForSelectedBranch(p) }} {{ p.nombreMedida }}</div>
             <div class="product-quantity">
-              <button mat-icon-button (click)="decreaseQuantity(p, qtyInput)" tabindex="-1" [disabled]="$loading() || orderService.$updatingOrder()">
-                <mat-icon>remove</mat-icon>
+              <button mat-icon-button [matTooltip]="stockError ? 'Ajustar al stock disponible' : 'Disminuir cantidad'" matTooltipClass="customer-search-tooltip"
+                      [attr.aria-label]="stockError ? 'Ajustar al stock disponible' : 'Disminuir cantidad'" (click)="decreaseQuantity(p, qtyInput)" tabindex="-1" [disabled]="$loading() || orderService.$updatingOrder()">
+                <mat-icon>{{ stockError ? 'refresh' : 'remove' }}</mat-icon>
               </button>
               <mat-form-field appearance="outline" class="input-container" subscriptSizing="dynamic">
-                <input matInput required type="number" min="0" class="quantity-input"
+                <input matInput required type="text" inputmode="decimal" class="quantity-input"
                        [max]="getAvailableQuantityForSelectedBranch(p)"
-                       [value]="getProductQuantityInOrder(p)"
+                       [value]="getQuantityDisplayValue(p)"
                        (input)="onQuantityChange(p, $event)"
                        (blur)="formatQuantity($event)"
                        (focus)="lastFocusedQtyIndex = $index"
@@ -63,7 +86,8 @@
                        tabindex="-1"
                        #qtyInput/>
               </mat-form-field>
-              <button mat-icon-button (click)="increaseQuantity(p, qtyInput)" tabindex="-1" [disabled]="$loading() || orderService.$updatingOrder()">
+              <button mat-icon-button matTooltip="Aumentar cantidad" matTooltipClass="customer-search-tooltip"
+                      aria-label="Aumentar cantidad" (click)="increaseQuantity(p, qtyInput)" tabindex="-1" [disabled]="stockError || $loading() || orderService.$updatingOrder()">
                 <mat-icon>add</mat-icon>
               </button>
             </div>
@@ -71,12 +95,12 @@
         </mat-card-content>
       </mat-card>
     }
-    @if ($loading()) {
+    @if ($loading() || orderService.$refreshingCheckoutItem()) {
       <div class="spinner">
         <mat-spinner diameter="50"></mat-spinner>
       </div>
     }
-    @if (!$loading() && $products().length === 0) {
+    @if (!$loading() && !orderService.$refreshingCheckoutItem() && $products().length === 0) {
       <div class="no-results">
         <img class="no-results-image" src="assets/no-products.svg" alt="" />
         <span>No existen productos que coincidan con la búsqueda</span>

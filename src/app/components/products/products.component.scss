@@ -32,6 +32,26 @@
 
     .product-card {
       background-color: white;
+
+      &.product-in-checkout {
+        border-color: black;
+        border-width: 2px;
+      }
+
+      &.product-stock-error {
+        border-color: var(--mat-sys-error);
+        color: var(--mat-sys-error);
+
+        .input-container {
+          --mat-form-field-outlined-outline-color: var(--mat-sys-error);
+          --mat-form-field-outlined-hover-outline-color: var(--mat-sys-error);
+          --mat-form-field-outlined-focus-outline-color: var(--mat-sys-error);
+        }
+
+        .quantity-input {
+          color: var(--mat-sys-error);
+        }
+      }
     }
 
     .spinner {
@@ -81,6 +101,10 @@
       }
 
       .product-code {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
         font-size: 13px;
       }
 
@@ -88,9 +112,27 @@
         font-size: 17px;
       }
 
+      .offer-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.5rem;
+        background-color: #30CC81;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
       .product-price {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
         font-size: 17px;
         font-weight: bold;
+
+        .original-price {
+          font-size: 0.875rem;
+          font-weight: normal;
+        }
       }
 
       .product-stock {

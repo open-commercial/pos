@@ -11,9 +11,14 @@ import { Pedido } from '../models/pedido.model';
 import { NuevoPedido } from '../models/nuevo-pedido.model';
 import { Producto } from "../models/producto.model";
 import { LocalStorageKeys, LocalStorageUtil } from "../utils/local-storage-util";
+import { ProductoFaltante } from '../models/producto-faltante.model';
 
 @Service()
 export class OrderService {
+
+  readonly $stockErrors = signal(new Map<number, ProductoFaltante>());
+  readonly $pendingStockChecks = signal(0);
+  readonly $refreshingCheckoutItem = signal(false);
 
   http = inject(HttpClient);
   localStorageUtil = inject(LocalStorageUtil);
