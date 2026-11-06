@@ -461,13 +461,6 @@ export class ProductsComponent {
     });
   }
 
-  private addOrRemoveProductToOrder(p: Producto) {
-    // call pedidoService to calculate new item
-
-    // call storageService to save current order using StorageKeys.PEDIDO
-
-  }
-
   private showErrorMessage(err: any) {
     if (err.status === 0) {
       this.notificationService.openSnackBar(SERVICE_UNAVAILABLE_MESSAGE, '', 3500);

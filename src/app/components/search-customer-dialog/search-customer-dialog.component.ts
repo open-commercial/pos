@@ -62,29 +62,6 @@ export class SearchCustomerDialogComponent {
     });
   }
 
-  /*
-    constructor() {
-      this.$loading.set(true);
-      this.authService.getLoggedUser()
-        .pipe(
-          switchMap(u => {
-            this.$selectedSucursalId.set(u.idSucursalPredeterminada);
-            return this.branchService.getBranches()
-          }))
-        .subscribe({
-          next: (sucursales) => {
-            this.$sucursales.set(sucursales);
-            this.$loading.set(false);
-          },
-          error: (err) => {
-            this.$loading.set(false);
-            this.showErrorMessage(err);
-            this.dialogRef.close();
-          }
-        });
-    }
-  */
-
   private loadSelectedCustomerId() {
     const customerAccount = this.storageService.getItem(LocalStorageKeys.CUSTOMER_ACCOUNT) as CuentaCorrienteCliente | null;
     this.$selectedCustomerId.set(customerAccount?.cliente?.idCliente ?? null);
