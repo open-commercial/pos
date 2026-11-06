@@ -4,18 +4,35 @@
   height: 100%;
 }
 
-.app-login {
-  width: 100%;
-  max-width: 350px;
+.login-container {
+  width: calc(100% - 3rem);
+  max-width: 440px;
   text-align: center;  
 
   .logo {
     width: 15rem;
+    margin-bottom: 2rem;
   }
 
   form {
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
+    gap: 1.5rem;
+  }
+
+  mat-form-field {
+    --mat-form-field-container-height: 4rem;
+    --mat-form-field-container-vertical-padding: 1.25rem;
+
+    input,
+    mat-label {
+      font-size: 1.25rem;
+    }
+  }
+
+  button {
+    min-height: 4rem;
+    padding: 1rem 1.5rem;
+    font-size: 1.25rem;
   }
 }

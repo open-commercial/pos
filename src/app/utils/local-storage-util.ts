@@ -1,17 +1,15 @@
-import { Injectable } from '@angular/core';
-import * as crypto from 'crypto-js';
+import { Service } from '@angular/core';
+import crypto from 'crypto-js';
 
-export enum StorageKeys {
-  ID_SUCURSAL = 'idSucursal',
+export enum LocalStorageKeys {
   TOKEN = 'token',
-  PEDIDO_NUEVO = 'nuevoPedido',
-  PEDIDO_EDITAR = 'editarPedido',
-  PEDIDO_FACTURAR = 'facturarPedido',
-  FACTURA_COMPRA_NUEVA = 'nuevaFacturaCompra',
+  ORDER = 'order',
+  CUSTOMER_ACCOUNT = 'customer_account',
+  PRODUCT_METADATA = 'product_metadata'
 }
 
-@Injectable({providedIn: 'root'})
-export class StorageService {
+@Service()
+export class LocalStorageUtil {
 
   getItem(key: string) {
     return this.decrypt(localStorage.getItem(key));
@@ -34,14 +32,14 @@ export class StorageService {
   }
 
   private encrypt(data: any): string {
-    return crypto.AES.encrypt(JSON.stringify(data), StorageService.getSK()).toString();
+    return crypto.AES.encrypt(JSON.stringify(data), LocalStorageUtil.getSK()).toString();
   }
 
-  private decrypt(data: string|null) {
+  private decrypt(data: string | null) {
     if (data === null || data === undefined) {
       return null;
     }
-    const bytes = crypto.AES.decrypt(data, StorageService.getSK());
+    const bytes = crypto.AES.decrypt(data, LocalStorageUtil.getSK());
     return JSON.parse(bytes.toString(crypto.enc.Utf8));
   }
 }

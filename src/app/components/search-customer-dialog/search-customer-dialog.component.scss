@@ -1,0 +1,63 @@
+mat-dialog-content {
+  padding: 1.5rem;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+mat-list-option {
+  min-height: 4rem;
+  --mat-list-list-item-label-text-size: 1.25rem;
+}
+
+mat-dialog-actions {
+  gap: 1rem;
+  padding: 1.5rem;
+
+  button {
+    flex: 1 1 12rem;
+    min-height: 4rem;
+    padding: 1rem 1.5rem;
+    font-size: 1.25rem;
+  }
+}
+
+.search-field {
+  width: 100%;
+  margin-top: 0.3rem;
+
+  input,
+  mat-label {
+    font-size: 1.25rem;
+  }
+}
+
+.spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background: rgba(244, 67, 54, 0.08);
+  color: #b71c1c;
+}
+
+.error-message {
+  font-weight: 500;
+}
+
+.retry-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  color: #b71c1c;
+}

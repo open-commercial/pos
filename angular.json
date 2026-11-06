@@ -99,23 +99,6 @@
           "options": {
             "buildTarget": "pos:build"
           }
-        },
-        "test": {
-          "builder": "@angular/build:karma",
-          "options": {
-            "polyfills": [],
-            "tsConfig": "tsconfig.spec.json",
-            "inlineStyleLanguage": "scss",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
-            "styles": [
-              "src/styles.scss",
-              "src/theme-colors.scss"
-            ],
-            "scripts": []
-          }
         }
       }
     }
@@ -131,7 +114,7 @@
       "type": "service"
     },
     "@schematics/angular:guard": {
-      "typeSeparator": "guard"
+      "typeSeparator": "."
     },
     "@schematics/angular:interceptor": {
       "typeSeparator": "."
